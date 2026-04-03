@@ -1,0 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .glass-panel {
+    @apply bg-white/70 dark:bg-[#0a0b0e]/70 backdrop-blur-md border border-white/20 dark:border-white/5;
+  }
+
+  .premium-shadow {
+    @apply shadow-xl shadow-slate-900/5 dark:shadow-slate-900/10;
+  }
+
+  .premium-glow {
+    @apply shadow-2xl shadow-orange-500/10 dark:shadow-orange-500/10;
+  }
+
+  .animate-scroll-up {
+    animation: scrollUp 30s linear infinite;
+  }
+
+  .animate-scroll-down {
+    animation: scrollDown 30s linear infinite;
+  }
+}
+
+@keyframes scrollUp {
+  0% {
+    transform: translateY(0);
+  }
+
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+@keyframes scrollDown {
+  0% {
+    transform: translateY(-50%);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+}
