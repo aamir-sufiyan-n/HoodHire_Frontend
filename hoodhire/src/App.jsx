@@ -24,8 +24,15 @@ import AdminDashboard from './components/admin/AdminDashboard';
 import ManageUsers from './components/admin/ManageUsers';
 import ManageBusinesses from './components/admin/ManageBusinesses';
 import ManageTickets from './components/admin/ManageTickets';
+import ManageRoles from './components/admin/ManageRoles';
 import BusinessDetails from './components/admin/BusinessDetails';
 import AdminProfile from './components/admin/AdminProfile';
+import WebConfig from './components/admin/WebConfig';
+import ManageJobs from './components/admin/ManageJobs';
+import ManageCategories from './components/admin/ManageCategories';
+import ManageSubscriptions from './components/admin/ManageSubscriptions';
+import SubscriptionRevenue from './components/admin/SubscriptionRevenue';
+import HirerSubscriptionsPage from './components/hirer/HirerSubscriptionsPage';
 import AdminRoute from './components/admin/AdminRoute';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -79,6 +86,7 @@ function App() {
         <Route path="/profile/hirer" element={<ProtectedRoute role="hirer"><HirerProfilePage /></ProtectedRoute>} />
         <Route path="/hirer/seeker/:id" element={<ProtectedRoute role="hirer"><DisplayProfile /></ProtectedRoute>} />
         <Route path="/hirer/jobs/:id" element={<ProtectedRoute role="hirer"><HirerJobDetails /></ProtectedRoute>} />
+        <Route path="/hirer/subscriptions" element={<ProtectedRoute role="hirer"><HirerSubscriptionsPage /></ProtectedRoute>} />
         <Route path="/applications" element={<ProtectedRoute role="seeker"><ApplicationsPage /></ProtectedRoute>} />
         <Route path="/companies" element={<CompaniesDirectory />} />
         <Route path="/companies/:id" element={<CompanyDetailsPage />} />
@@ -94,6 +102,12 @@ function App() {
           <Route path="businesses" element={<ManageBusinesses />} />
           <Route path="businesses/:id" element={<BusinessDetails />} />
           <Route path="tickets" element={<ManageTickets />} />
+          <Route path="roles" element={<ManageRoles />} />
+          <Route path="jobs" element={<ManageJobs />} />
+          <Route path="categories" element={<ManageCategories />} />
+          <Route path="subscriptions" element={<ManageSubscriptions />} />
+          <Route path="revenue" element={<SubscriptionRevenue />} />
+          <Route path="config" element={<WebConfig />} />
           <Route path="profile" element={<AdminProfile />} />
         </Route>
       </Routes>

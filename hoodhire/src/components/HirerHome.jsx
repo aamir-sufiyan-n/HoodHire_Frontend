@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { CheckCircle2 } from 'lucide-react';
 import {
     PlusCircle, User, Briefcase, Users, UserCheck,
     Home, ChevronRight, BarChart3, Building2, Sparkles, MoveRight, Clock,
-    CheckCircle, XCircle, MessageSquare, HelpCircle
+    XCircle, MessageSquare, HelpCircle
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { hirerAPI } from '../api/hirer';
 import { jobsAPI } from '../api/jobs';
 import { chatAPI } from '../api/chat';
@@ -35,6 +37,9 @@ const HirerHome = () => {
     const [totalStaff, setTotalStaff] = useState(0);
     const [isDashboardLoading, setIsDashboardLoading] = useState(true);
     const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
+    const [subscriptionPlans, setSubscriptionPlans] = useState([]);
+    const [isSubscribed, setIsSubscribed] = useState(false);
+    const [subscriptionData, setSubscriptionData] = useState(null);
 
     useEffect(() => {
         if (isDarkMode) {
@@ -64,12 +69,15 @@ const HirerHome = () => {
             if (user?.role !== 'hirer') return;
             setIsDashboardLoading(true);
             try {
-                // Fetch basic jobs and categories
-                const [res, catRes] = await Promise.all([
+                // Fetch basic jobs, categories and subscriptions
+                const [res, catRes, subRes] = await Promise.all([
                     jobsAPI.getMyJobs(),
-                    jobsAPI.getCategories().catch(() => ({ categories: [] }))
+                    jobsAPI.getCategories().catch(() => ({ categories: [] })),
+                    hirerAPI.getSubscriptionPlans().catch(() => [])
                 ]);
                 const myJobs = res?.jobs || [];
+                setSubscriptionPlans(Array.isArray(subRes) ? subRes : []);
+                
                 const categoriesMap = {};
                 if (catRes && catRes.categories) {
                     catRes.categories.forEach(c => categoriesMap[c.ID] = c);
@@ -111,8 +119,20 @@ const HirerHome = () => {
             }
         };
 
+        const fetchSubscriptionStatus = async () => {
+            if (user?.role !== 'hirer') return;
+            try {
+                const res = await hirerAPI.getSubscriptionStatus();
+                setIsSubscribed(res.subscribed && res.status === 'active');
+                setSubscriptionData(res);
+            } catch (err) {
+                console.error("Failed to fetch subscription status:", err);
+            }
+        };
+
         fetchUserData();
         fetchDashboardStats();
+        fetchSubscriptionStatus();
 
         // Subscribe to unread count updates
         const fetchInitialUnread = async () => {
@@ -154,14 +174,15 @@ const HirerHome = () => {
 
                     {/* Right side actions */}
                     <div className="flex items-center gap-4 lg:gap-6 shrink-0">
-                        <button
-                            onClick={() => setActiveTab('messages')}
-                            className={`p-2 rounded-full hover:bg-slate-100 dark:hover:bg-[#262933] transition-colors relative ${activeTab === 'messages' ? 'bg-[#009966]/10' : ''}`}
-                            aria-label="Messages"
-                        >
-                            <MessageSquare className={`h-5 w-5 ${activeTab === 'messages' ? 'text-[#009966]' : 'text-slate-400 hover:text-[#009966]'} transition-colors`} />
-                        </button>
-
+                        {!isDashboardLoading && !isSubscribed && (
+                            <button
+                                onClick={() => navigate('/hirer/subscriptions')}
+                                className="hidden sm:flex items-center gap-2 bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-slate-900 font-extrabold px-4 py-2 rounded-full text-xs uppercase tracking-wider transition-all shadow-md hover:shadow-lg active:scale-95 border-none"
+                            >
+                                <Sparkles size={14} className="animate-pulse" />
+                                Go Pro
+                            </button>
+                        )}
                         <button
                             onClick={() => setIsDarkMode(!isDarkMode)}
                             className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-[#262933] transition-colors"
@@ -206,7 +227,7 @@ const HirerHome = () => {
                             <div className="relative w-24 h-24 mb-4 group">
                                 <div className="absolute inset-0 bg-gradient-to-br from-[#3b9f87] to-[#009966] rounded-full opacity-20 blur-md group-hover:opacity-30 transition-opacity"></div>
                                 <div className="absolute inset-0 flex items-center justify-center relative z-10">
-                                    <div className="w-full h-full bg-white dark:bg-[#1a1d24] rounded-full flex items-center justify-center overflow-hidden border-4 border-slate-50 dark:border-[#16181d] shadow-sm transform group-hover:scale-105 transition-transform duration-300">
+                                    <div className={`w-full h-full bg-white dark:bg-[#1a1d24] rounded-full flex items-center justify-center overflow-hidden shadow-sm transform group-hover:scale-105 transition-transform duration-300 border-4 ${isSubscribed ? 'border-[#0095F6]' : 'border-slate-50 dark:border-[#16181d]'}`}>
                                         <div className="w-full h-full flex items-center justify-center bg-white dark:bg-[#007744]/30 text-[#009966] dark:text-[#009966]">
                                             {(profileData?.Business?.ProfilePicture || profileData?.ProfilePicture || profileData?.profile_picture) ? (
                                                 <img src={profileData?.Business?.ProfilePicture || profileData.ProfilePicture || profileData.profile_picture} alt="Profile" className="w-full h-full object-cover" />
@@ -217,8 +238,11 @@ const HirerHome = () => {
                                     </div>
                                 </div>
                             </div>
-                            <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-0.5 capitalize tracking-tight">
+                            <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-0.5 capitalize tracking-tight flex items-center justify-center gap-1.5">
                                 {profileData?.Business?.BusinessName || profileData?.Business?.business_name || (user?.username || 'Employer')}
+                                {isSubscribed && (
+                                    <CheckCircle2 size={16} className="text-[#0095F6] fill-[#0095F6]/10" title="Verified Business" />
+                                )}
                             </h2>
                             <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 mb-2">
                                 {user?.email || 'No email provided'}
@@ -274,6 +298,8 @@ const HirerHome = () => {
                     {/* Center Column Content */}
                     {activeTab === 'dashboard' ? (
                         <div className="flex flex-col gap-8">
+                            {/* Sliding Subscription Banner Removed */}
+
                             {/* Welcome Header */}
                             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                                 <div>

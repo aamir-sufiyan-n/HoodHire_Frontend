@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Star, MapPin, Building2, Trash2, ChevronRight, Users, Calendar, ChevronLeft } from 'lucide-react';
+import { Star, MapPin, Building2, Trash2, ChevronRight, Users, Calendar, ChevronLeft, CheckCircle2 } from 'lucide-react';
 import { seekerAPI } from '../../api/seeker';
 import { toast } from 'react-hot-toast';
 
@@ -96,7 +96,7 @@ const FavoriteBusinesses = () => {
                         <div>
                             <div className="flex justify-between items-start mb-4">
                                 <div className="flex gap-4">
-                                    <div className="w-12 h-12 shrink-0 bg-white dark:bg-[#1a1d24] border border-slate-100 dark:border-[#303340] rounded-md flex items-center justify-center p-0 overflow-hidden shadow-sm">
+                                    <div className={`w-12 h-12 shrink-0 bg-white dark:bg-[#1a1d24] rounded-md flex items-center justify-center p-0 overflow-hidden shadow-sm ${(business.Hirer?.IsPRO || business.IsPRO) ? 'border-2 border-[#0095F6]' : 'border border-slate-100 dark:border-[#303340]'}`}>
                                         {(business.ProfilePicture || business.LogoUrl) ? (
                                             <img
                                                 src={business.ProfilePicture || business.LogoUrl}
@@ -108,7 +108,12 @@ const FavoriteBusinesses = () => {
                                         )}
                                     </div>
                                     <div className="flex flex-col">
-                                        <h4 className="text-[17px] font-extrabold text-slate-900 dark:text-white group-hover:text-[#009966] transition-colors">{business.BusinessName}</h4>
+                                        <h4 className="text-[17px] font-extrabold text-slate-900 dark:text-white group-hover:text-[#009966] transition-colors flex items-center gap-1.5">
+                                            {business.BusinessName}
+                                            {(business.Hirer?.IsPRO || business.IsPRO) && (
+                                                <CheckCircle2 size={16} className="text-[#0095F6] fill-[#0095F6]/10 shrink-0" title="Verified Business" />
+                                            )}
+                                        </h4>
                                         <div className="flex items-center gap-2 text-[12px] font-bold text-orange-500 mt-0.5">
                                             <Star size={12} fill="currentColor" />
                                             <span>{business.AverageRating?.toFixed(1) || '0.0'}</span>

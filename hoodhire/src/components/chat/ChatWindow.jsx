@@ -10,7 +10,8 @@ import {
     ImageIcon,
     Phone,
     Video,
-    Info
+    Info,
+    CheckCircle2
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { chatAPI } from '../../api/chat';
@@ -184,6 +185,7 @@ const ChatWindow = ({ conversation, currentUser, onBack }) => {
     const messageParterName = otherUser?.FullName || otherUser?.full_name || otherUser?.BusinessName || otherUser?.Username;
     const displayUsername = messageParterName || conversation?.username || 'Chat Partner';
     const displayPicture = otherUser?.ProfilePicture || conversation?.profile_picture;
+    const isPro = otherUser?.IsPRO || conversation?.is_pro || conversation?.IsPRO;
 
     return (
         <div className="flex-1 flex flex-col h-full bg-white dark:bg-[#16181d] relative">
@@ -208,7 +210,7 @@ const ChatWindow = ({ conversation, currentUser, onBack }) => {
                             }
                         }}
                     >
-                        <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-[#262933] border border-slate-200 dark:border-[#303340] overflow-hidden flex items-center justify-center group-hover:border-emerald-500 transition-colors">
+                        <div className={`w-10 h-10 rounded-full bg-slate-100 dark:bg-[#262933] overflow-hidden flex items-center justify-center group-hover:border-emerald-500 transition-colors ${isPro ? 'border-2 border-[#0095F6]' : 'border border-slate-200 dark:border-[#303340]'}`}>
                             {displayPicture ? (
                                 <img src={displayPicture} alt={displayUsername} className="w-full h-full object-cover" />
                             ) : (
@@ -218,6 +220,9 @@ const ChatWindow = ({ conversation, currentUser, onBack }) => {
                         <div className="flex flex-col">
                             <h3 className="text-sm font-bold text-slate-900 dark:text-white leading-tight group-hover:text-emerald-500 transition-colors">
                                 {displayUsername}
+                                {isPro && (
+                                    <CheckCircle2 size={12} className="text-[#0095F6] fill-[#0095F6]/10 shrink-0 ml-1" />
+                                )}
                             </h3>
                             <span className="text-[10px] font-bold text-emerald-500">Online</span>
                         </div>

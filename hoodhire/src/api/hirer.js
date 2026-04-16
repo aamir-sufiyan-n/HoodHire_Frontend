@@ -235,5 +235,68 @@ export const hirerAPI = {
             credentials: 'include'
         });
         return handleResponse(response);
+    },
+
+    /**
+     * Get available subscription plans for hirers
+     */
+    getSubscriptionPlans: async () => {
+        const token = getToken();
+        const response = await fetch(`${API_BASE_URL}/hirer/subscription/plans`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            credentials: 'include'
+        });
+        return handleResponse(response);
+    },
+
+    createOrder: async (planName) => {
+    const token = getToken();
+
+    const response = await fetch(`${API_BASE_URL}/hirer/subscription/create-order`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+            plan: planName
+        })
+    });
+
+    return handleResponse(response);
+},
+
+    verifyPayment: async (paymentData) => {
+        const token = getToken();
+        const response = await fetch(`${API_BASE_URL}/hirer/subscription/verify`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            credentials: 'include',
+            body: JSON.stringify(paymentData)
+        });
+        return handleResponse(response);
+    },
+
+    /**
+     * Get the Hirer's current subscription status
+     * @returns {Promise<Object>}
+     */
+    getSubscriptionStatus: async () => {
+        const token = getToken();
+        const response = await fetch(`${API_BASE_URL}/hirer/subscription/status`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            credentials: 'include'
+        });
+        return handleResponse(response);
     }
 };

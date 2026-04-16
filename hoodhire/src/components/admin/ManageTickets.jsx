@@ -10,7 +10,7 @@ import {
   Tag
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { adminAPI } from '../../api/admin';
+import { adminAPI } from '../../api/admin/admin';
 
 const ManageTickets = () => {
     const [tickets, setTickets] = useState([]);
@@ -100,13 +100,13 @@ const ManageTickets = () => {
                         placeholder="Search tickets by subject or user..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2 bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2a2d35] rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500/50 transition-all outline-none text-slate-700 dark:text-slate-200 placeholder:text-slate-400"
+                        className="w-full pl-10 pr-4 py-2 bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#2a2d35] rounded-md text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500/50 transition-all outline-none text-slate-700 dark:text-slate-200 placeholder:text-slate-400"
                     />
                 </div>
             </div>
 
             {/* Responsive Filter Bar */}
-            <div className="flex flex-wrap items-center gap-4 bg-white dark:bg-[#1a1d24] p-4 rounded-xl border border-slate-200 dark:border-[#2a2d35] shadow-sm">
+            <div className="flex flex-wrap items-center gap-4 bg-white dark:bg-[#1a1d24] p-4 rounded-lg border border-slate-200 dark:border-[#2a2d35] shadow-sm">
                 <div className="flex items-center gap-2 pr-2 border-r border-slate-200 dark:border-[#2a2d35]">
                     <Filter size={16} className="text-slate-400" />
                     <span className="text-sm font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Filters</span>
@@ -117,7 +117,7 @@ const ManageTickets = () => {
                     <select
                         value={filterStatus}
                         onChange={(e) => { setFilterStatus(e.target.value); setCurrentPage(1); }}
-                        className="bg-slate-50 dark:bg-[#16181d] border border-slate-200 dark:border-[#2a2d35] rounded-lg px-3 py-1.5 text-sm outline-none focus:border-emerald-500/50 transition-all text-slate-700 dark:text-slate-300 font-medium"
+                        className="bg-slate-50 dark:bg-[#16181d] border border-slate-200 dark:border-[#2a2d35] rounded-md px-3 py-1.5 text-sm outline-none focus:border-emerald-500/50 transition-all text-slate-700 dark:text-slate-300 font-medium"
                     >
                         <option value="all">All Statuses</option>
                         <option value="open">Open</option>
@@ -132,7 +132,7 @@ const ManageTickets = () => {
                     <select
                         value={filterType}
                         onChange={(e) => { setFilterType(e.target.value); setCurrentPage(1); }}
-                        className="bg-slate-50 dark:bg-[#16181d] border border-slate-200 dark:border-[#2a2d35] rounded-lg px-3 py-1.5 text-sm outline-none focus:border-emerald-500/50 transition-all text-slate-700 dark:text-slate-300 font-medium"
+                        className="bg-slate-50 dark:bg-[#16181d] border border-slate-200 dark:border-[#2a2d35] rounded-md px-3 py-1.5 text-sm outline-none focus:border-emerald-500/50 transition-all text-slate-700 dark:text-slate-300 font-medium"
                     >
                         <option value="all">All Types</option>
                         <option value="complaint">Complaint</option>
@@ -144,13 +144,13 @@ const ManageTickets = () => {
             {/* List Area */}
             <div className="grid grid-cols-1 gap-4">
                 {loading ? (
-                    <div className="flex flex-col items-center justify-center py-24 bg-white dark:bg-[#1a1d24] rounded-2xl border border-slate-200 dark:border-[#2a2d35] shadow-sm">
+                    <div className="flex flex-col items-center justify-center py-24 bg-white dark:bg-[#1a1d24] rounded-lg border border-slate-200 dark:border-[#2a2d35] shadow-sm">
                         <Loader2 className="w-10 h-10 text-emerald-600 animate-spin mb-4" />
                         <p className="text-slate-500 font-bold animate-pulse">Fetching tickets...</p>
                     </div>
                 ) : tickets.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-24 bg-white dark:bg-[#1a1d24] rounded-2xl border border-slate-200 dark:border-[#2a2d35] text-center shadow-sm">
-                        <div className="w-16 h-16 bg-slate-50 dark:bg-[#16181d] rounded-full flex items-center justify-center mb-4">
+                    <div className="flex flex-col items-center justify-center py-24 bg-white dark:bg-[#1a1d24] rounded-lg border border-slate-200 dark:border-[#2a2d35] text-center shadow-sm">
+                        <div className="w-16 h-16 bg-slate-50 dark:bg-[#16181d] rounded-md flex items-center justify-center mb-4">
                             <TicketCheck size={32} className="text-slate-300" />
                         </div>
                         <h3 className="text-lg font-bold text-slate-900 dark:text-white">No tickets found</h3>
@@ -158,13 +158,13 @@ const ManageTickets = () => {
                     </div>
                 ) : (
                     tickets.map((ticket) => (
-                        <div key={ticket.ID} className="bg-white dark:bg-[#1a1d24] p-6 rounded-2xl border border-slate-200 dark:border-[#2a2d35] shadow-sm transition-all hover:shadow-md hover:border-emerald-500/20 group relative overflow-hidden">
+                        <div key={ticket.ID} className="bg-white dark:bg-[#1a1d24] p-6 rounded-lg border border-slate-200 dark:border-[#2a2d35] shadow-sm transition-all hover:shadow-md hover:border-emerald-500/20 group relative overflow-hidden">
                             {/* Accent highlight */}
                             <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500/0 group-hover:bg-emerald-500/100 transition-all" />
 
                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-5">
                                 <div className="flex items-center gap-4">
-                                    <div className={`p-2.5 rounded-xl border ${getStatusColor(ticket.Status)}`}>
+                                    <div className={`p-2.5 rounded-md border ${getStatusColor(ticket.Status)}`}>
                                         <AlertCircle size={22} />
                                     </div>
                                     <div>
@@ -179,23 +179,23 @@ const ManageTickets = () => {
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${getStatusColor(ticket.Status)}`}>
+                                    <span className={`px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-widest border ${getStatusColor(ticket.Status)}`}>
                                         {ticket.Status}
                                     </span>
-                                    <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-slate-100 dark:bg-[#2a2d35] text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-[#3a3d45]">
+                                    <span className="px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-widest bg-slate-100 dark:bg-[#2a2d35] text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-[#3a3d45]">
                                         {ticket.Type}
                                     </span>
                                 </div>
                             </div>
 
-                            <p className="text-sm font-medium text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-[#16181d] p-4 rounded-xl mb-6 shadow-inner border border-slate-100 dark:border-white/5 leading-relaxed">
+                            <p className="text-sm font-medium text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-[#16181d] p-4 rounded-md mb-6 shadow-inner border border-slate-100 dark:border-white/5 leading-relaxed">
                                 {ticket.Description}
                             </p>
 
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-5 border-t border-slate-100 dark:border-white/5">
                                 <div className="flex items-center gap-2">
                                     {ticket.BusinessName ? (
-                                        <div className="flex items-center gap-2 text-[11px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-3 py-1.5 rounded-lg border border-emerald-100 dark:border-emerald-800/30 uppercase tracking-wider shadow-sm">
+                                        <div className="flex items-center gap-2 text-[11px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-3 py-1.5 rounded-md border border-emerald-100 dark:border-emerald-800/30 uppercase tracking-wider shadow-sm">
                                             <Building2 size={13} />
                                             {ticket.BusinessName}
                                         </div>
@@ -211,24 +211,24 @@ const ManageTickets = () => {
                                                 value={replies[ticket.ID] || ''}
                                                 onChange={(e) => setReplies(prev => ({ ...prev, [ticket.ID]: e.target.value }))}
                                                 placeholder="Write a reply or internal note before taking action..."
-                                                className="w-full min-h-[80px] p-4 text-sm bg-slate-50 dark:bg-[#16181d] border border-slate-200 dark:border-[#2a2d35] rounded-xl outline-none focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/10 transition-all text-slate-700 dark:text-slate-300 placeholder:text-slate-400 resize-none"
+                                                className="w-full min-h-[80px] p-4 text-sm bg-slate-50 dark:bg-[#16181d] border border-slate-200 dark:border-[#2a2d35] rounded-md outline-none focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/10 transition-all text-slate-700 dark:text-slate-300 placeholder:text-slate-400 resize-none"
                                             />
                                             <div className="flex items-center justify-end gap-3">
                                                 <button
                                                     onClick={() => handleAction(ticket.ID, adminAPI.resolveTicket, 'resolved')}
-                                                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-black uppercase tracking-widest rounded-lg transition-all shadow-lg shadow-emerald-600/20 flex items-center gap-2 transform active:scale-95"
+                                                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-black uppercase tracking-widest rounded-md transition-all shadow-lg shadow-emerald-600/20 flex items-center gap-2 transform active:scale-95"
                                                 >
                                                     <CheckCircle size={14} /> Resolve
                                                 </button>
                                                 <button
                                                     onClick={() => handleAction(ticket.ID, adminAPI.reviewTicket, 'reviewed')}
-                                                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-black uppercase tracking-widest rounded-lg transition-all shadow-lg shadow-blue-600/20 flex items-center gap-2 transform active:scale-95"
+                                                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-black uppercase tracking-widest rounded-md transition-all shadow-lg shadow-blue-600/20 flex items-center gap-2 transform active:scale-95"
                                                 >
                                                     <Clock size={14} /> Review
                                                 </button>
                                                 <button
                                                     onClick={() => handleAction(ticket.ID, adminAPI.dismissTicket, 'dismissed')}
-                                                    className="px-4 py-2 bg-white dark:bg-[#202329] border border-slate-200 dark:border-[#3a3d45] text-slate-500 hover:text-rose-600 hover:border-rose-200 dark:hover:border-rose-900/50 text-[11px] font-black uppercase tracking-widest rounded-lg transition-all flex items-center gap-2 hover:bg-rose-50 dark:hover:bg-rose-900/10 shadow-sm"
+                                                    className="px-4 py-2 bg-white dark:bg-[#202329] border border-slate-200 dark:border-[#3a3d45] text-slate-500 hover:text-rose-600 hover:border-rose-200 dark:hover:border-rose-900/50 text-[11px] font-black uppercase tracking-widest rounded-md transition-all flex items-center gap-2 hover:bg-rose-50 dark:hover:bg-rose-900/10 shadow-sm"
                                                 >
                                                     Dismiss
                                                 </button>
@@ -236,7 +236,7 @@ const ManageTickets = () => {
                                         </div>
                                     )}
                                     {ticket.Status !== 'open' && (
-                                        <div className="text-xs font-bold text-slate-400 dark:text-slate-600 px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-[#16181d] border border-slate-100 dark:border-[#2a2d35]">
+                                        <div className="text-xs font-bold text-slate-400 dark:text-slate-600 px-3 py-1.5 rounded-md bg-slate-50 dark:bg-[#16181d] border border-slate-100 dark:border-[#2a2d35]">
                                             Processed by Admin
                                         </div>
                                     )}
@@ -249,7 +249,7 @@ const ManageTickets = () => {
 
             {/* Simple Pagination */}
             {totalPages > 1 && (
-                <div className="flex items-center justify-between pt-4 bg-white dark:bg-[#1a1d24] p-4 rounded-xl border border-slate-200 dark:border-[#2a2d35] shadow-sm">
+                <div className="flex items-center justify-between pt-4 bg-white dark:bg-[#1a1d24] p-4 rounded-lg border border-slate-200 dark:border-[#2a2d35] shadow-sm">
                     <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">
                         Page <span className="text-slate-900 dark:text-white">{currentPage}</span> of {totalPages}
                     </span>
@@ -257,14 +257,14 @@ const ManageTickets = () => {
                         <button
                             disabled={currentPage === 1}
                             onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                            className="p-2 bg-slate-50 dark:bg-[#16181d] text-slate-500 hover:text-emerald-600 rounded-lg disabled:opacity-50 border border-slate-200 dark:border-[#2a2d35] transition-colors"
+                            className="p-2 bg-slate-50 dark:bg-[#16181d] text-slate-500 hover:text-emerald-600 rounded-md disabled:opacity-50 border border-slate-200 dark:border-[#2a2d35] transition-colors"
                         >
                             &larr; Previous
                         </button>
                         <button
                             disabled={currentPage === totalPages}
                             onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                            className="p-2 bg-slate-50 dark:bg-[#16181d] text-slate-500 hover:text-emerald-600 rounded-lg disabled:opacity-50 border border-slate-200 dark:border-[#2a2d35] transition-colors"
+                            className="p-2 bg-slate-50 dark:bg-[#16181d] text-slate-500 hover:text-emerald-600 rounded-md disabled:opacity-50 border border-slate-200 dark:border-[#2a2d35] transition-colors"
                         >
                             Next &rarr;
                         </button>

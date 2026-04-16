@@ -437,7 +437,7 @@ const JobListings = () => {
 
                                             {/* Job Info */}
                                             <div className="flex-1 flex gap-4 cursor-pointer" onClick={() => navigate(`/jobs/${job.ID}`)}>
-                                                <div className="w-12 h-12 shrink-0 bg-slate-50 dark:bg-[#1a1d24] border border-slate-100 dark:border-[#303340] rounded-sm flex items-center justify-center p-0 overflow-hidden shadow-sm">
+                                                <div className={`w-12 h-12 shrink-0 bg-slate-50 dark:bg-[#1a1d24] rounded-sm flex items-center justify-center p-0 overflow-hidden shadow-sm ${(job.Business?.Hirer?.IsPRO || job.Business?.IsPRO) ? 'border-2 border-[#0095F6]' : 'border border-slate-100 dark:border-[#303340]'}`}>
                                                     {(job.Business?.ProfilePicture || job.Business?.Hirer?.ProfilePicture || job.Hirer?.ProfilePicture || job.ProfilePicture) ? (
                                                         <img
                                                             src={job.Business?.ProfilePicture || job.Business?.Hirer?.ProfilePicture || job.Hirer?.ProfilePicture || job.ProfilePicture}
@@ -452,7 +452,12 @@ const JobListings = () => {
                                                 </div>
                                                 <div className="flex flex-col">
                                                     <h3 className="text-[17px] font-bold text-slate-900 dark:text-white capitalize group-hover:text-[#008855] dark:group-hover:text-[#009966] transition-colors leading-tight">{job.Description?.Title}</h3>
-                                                    <p className="text-[13px] font-semibold text-[#009966] mb-1.5">{job.Business?.BusinessName}</p>
+                                                    <p className="text-[13px] font-semibold text-[#009966] mb-1.5 flex items-center gap-1.5">
+                                                        {job.Business?.BusinessName}
+                                                        {(job.Business?.Hirer?.IsPRO || job.Business?.IsPRO) && (
+                                                            <CheckCircle2 size={14} className="text-[#0095F6] fill-[#0095F6]/10 shrink-0" title="Verified Business" />
+                                                        )}
+                                                    </p>
                                                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px] font-medium text-slate-500 dark:text-slate-400">
                                                         <span className="flex items-center gap-1"><MapPin size={12} />{job.Business?.Locality || job.Business?.City || 'Local'}</span>
                                                         <span className="flex items-center gap-1 capitalize"><Navigation size={12} />{job.Description?.JobType?.replace('_', ' ')}</span>

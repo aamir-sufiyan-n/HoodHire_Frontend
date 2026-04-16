@@ -11,11 +11,12 @@ import {
   Clock,
   Loader2,
   Eye,
-  Filter
+  Filter,
+  FileDown
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import Swal from 'sweetalert2';
-import { adminAPI } from '../../api/admin';
+import { adminAPI, API_BASE_URL } from '../../api/admin/admin';
 
 const ManageBusinesses = () => {
   const navigate = useNavigate();
@@ -45,6 +46,10 @@ const ManageBusinesses = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleExport = () => {
+    window.open(`${API_BASE_URL}/admin/businesses/export`, '_blank');
   };
 
   useEffect(() => {
@@ -171,9 +176,16 @@ const ManageBusinesses = () => {
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Manage Businesses</h1>
           <p className="text-slate-500 dark:text-slate-400 mt-1">Approve new businesses and manage existing ones.</p>
         </div>
+        <button 
+          onClick={handleExport}
+          className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-[#1a1d24] hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-bold rounded-md transition-all border border-slate-200 dark:border-slate-800 active:scale-95 shrink-0"
+        >
+          <FileDown size={18} className="text-emerald-600" />
+          Export PDF
+        </button>
       </div>
 
-      <div className="flex flex-col md:flex-row md:items-center gap-4 bg-white dark:bg-[#1a1d24] p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+      <div className="flex flex-col md:flex-row md:items-center gap-4 bg-white dark:bg-[#1a1d24] p-4 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm">
         <div className="flex items-center gap-2 shrink-0">
           <Filter size={16} className="text-slate-400" />
           <span className="text-sm font-semibold text-slate-600 dark:text-slate-400">Filter:</span>
@@ -189,7 +201,7 @@ const ManageBusinesses = () => {
               setSearchTerm(e.target.value);
               setPage(1); // Reset to page 1 on search
             }}
-            className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none dark:text-slate-300"
+            className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-md text-sm focus:ring-2 focus:ring-emerald-500/20 transition-all outline-none dark:text-slate-300"
           />
         </div>
 
@@ -200,7 +212,7 @@ const ManageBusinesses = () => {
               setStatusFilter(e.target.value);
               setPage(1);
             }}
-            className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500/20 transition-colors dark:text-slate-300 font-medium cursor-pointer flex-1 md:w-40"
+            className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-md px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500/20 transition-colors dark:text-slate-300 font-medium cursor-pointer flex-1 md:w-40"
           >
             <option value="all">Any Status</option>
             <option value="pending">Pending</option>
@@ -215,7 +227,7 @@ const ManageBusinesses = () => {
               setVerifiedFilter(e.target.value);
               setPage(1);
             }}
-            className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500/20 transition-colors dark:text-slate-300 font-medium cursor-pointer flex-1 md:w-40"
+            className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-md px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500/20 transition-colors dark:text-slate-300 font-medium cursor-pointer flex-1 md:w-40"
           >
             <option value="all">All Access</option>
             <option value="true">Verified</option>
@@ -224,7 +236,7 @@ const ManageBusinesses = () => {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-[#1a1d24] rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+      <div className="bg-white dark:bg-[#1a1d24] rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20">
@@ -254,8 +266,16 @@ const ManageBusinesses = () => {
                     <tr key={business.ID} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900/20 flex items-center justify-center">
-                            <Building2 className="w-5 h-5 text-emerald-600 dark:text-emerald-500" />
+                          <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900/20 flex items-center justify-center overflow-hidden border border-slate-100 dark:border-slate-800">
+                            {business.ProfilePicture || business.profile_picture ? (
+                              <img 
+                                src={business.ProfilePicture || business.profile_picture} 
+                                alt="" 
+                                className="w-full h-full object-cover" 
+                              />
+                            ) : (
+                              <Building2 className="w-5 h-5 text-emerald-600 dark:text-emerald-500" />
+                            )}
                           </div>
                           <p className="text-sm font-semibold text-slate-900 dark:text-white">{business.BusinessName}</p>
                         </div>
@@ -310,7 +330,7 @@ const ManageBusinesses = () => {
               <button
                 onClick={() => setPage(prev => Math.max(prev - 1, 1))}
                 disabled={page === 1 || loading}
-                className="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-slate-200 dark:border-slate-700"
+                className="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-slate-200 dark:border-slate-700"
               >
                 Previous
               </button>
@@ -320,7 +340,7 @@ const ManageBusinesses = () => {
               <button
                 onClick={() => setPage(prev => prev + 1)}
                 disabled={businesses.length < 20 || loading}
-                className="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-slate-200 dark:border-slate-700"
+                className="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-slate-200 dark:border-slate-700"
               >
                 Next
               </button>

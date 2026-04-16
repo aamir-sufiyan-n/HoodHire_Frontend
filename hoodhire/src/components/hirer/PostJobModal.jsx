@@ -21,6 +21,7 @@ const PostJobModal = ({ isOpen, onClose, onJobPosted, editingJob = null }) => {
         max_age: 60,
         gender_pref: 'any',
         experience_required: false,
+        resume_required: false,
         friday: false, saturday: false, sunday: false,
         deadline: '',
         key_responsibilities: [],
@@ -61,6 +62,7 @@ const PostJobModal = ({ isOpen, onClose, onJobPosted, editingJob = null }) => {
                 max_age: editingJob.Description?.MaxAge || 60,
                 gender_pref: editingJob.Description?.GenderPref || 'any',
                 experience_required: editingJob.Description?.ExperienceRequired || false,
+                resume_required: editingJob.Description?.ResumeRequired || false,
                 monday: editingJob.Description?.Monday || false,
                 tuesday: editingJob.Description?.Tuesday || false,
                 wednesday: editingJob.Description?.Wednesday || false,
@@ -78,7 +80,7 @@ const PostJobModal = ({ isOpen, onClose, onJobPosted, editingJob = null }) => {
                 category_id: categories.length > 0 ? categories[0].ID : '',
                 title: '', description: '', job_type: 'part_time', shift: 'flexible', duration: '',
                 salary_min: '', salary_max: '', salary_type: 'hourly', min_age: 18, max_age: 60,
-                gender_pref: 'any', experience_required: false,
+                gender_pref: 'any', experience_required: false, resume_required: false,
                 monday: false, tuesday: false, wednesday: false, thursday: false,
                 friday: false, saturday: false, sunday: false, deadline: '',
                 key_responsibilities: [], skills: []
@@ -349,10 +351,22 @@ const PostJobModal = ({ isOpen, onClose, onJobPosted, editingJob = null }) => {
                                         <option value="female">Female</option>
                                     </select>
                                 </div>
-                                <div className="flex items-center mt-6">
-                                    <label className="flex items-center gap-3 cursor-pointer">
-                                        <input type="checkbox" name="experience_required" checked={formData.experience_required} onChange={handleChange} className="w-5 h-5 text-[#008855] rounded bg-slate-100 border-slate-300 focus:ring-[#009966] dark:bg-[#1a1d24] dark:border-[#303340] accent-[#009966]" />
-                                        <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Exp. Required</span>
+                                <div className="flex flex-col md:flex-row gap-6 mt-6">
+                                    <label className="flex items-center gap-3 cursor-pointer group">
+                                        <div className="relative">
+                                            <input type="checkbox" name="experience_required" checked={formData.experience_required} onChange={handleChange} className="w-5 h-5 text-[#008855] rounded-md bg-slate-100 border-slate-300 focus:ring-[#009966] dark:bg-[#1a1d24] dark:border-[#303340] accent-[#009966] transition-all" />
+                                        </div>
+                                        <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 group-hover:text-[#009966] transition-colors">Experience Required</span>
+                                    </label>
+
+                                    <label className="flex items-center gap-3 cursor-pointer group">
+                                        <div className="relative">
+                                            <input type="checkbox" name="resume_required" checked={formData.resume_required} onChange={handleChange} className="w-5 h-5 text-[#008855] rounded-md bg-slate-100 border-slate-300 focus:ring-[#009966] dark:bg-[#1a1d24] dark:border-[#303340] accent-[#009966] transition-all" />
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 group-hover:text-[#009966] transition-colors">Resume Required</span>
+                                            <span className="text-[10px] text-slate-400 font-medium leading-none">Seekers must attach a resume</span>
+                                        </div>
                                     </label>
                                 </div>
                             </div>

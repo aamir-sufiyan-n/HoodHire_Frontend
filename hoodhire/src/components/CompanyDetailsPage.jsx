@@ -372,7 +372,7 @@ const CompanyDetailsPage = () => {
 
                         {/* Left Column: Profile Picture */}
                         <div className="flex flex-col items-center gap-4 shrink-0">
-                            <div className="w-[100px] h-[100px] md:w-[130px] md:h-[130px] shrink-0 bg-white dark:bg-[#16181d] rounded-md border border-slate-100 dark:border-[#303340] flex items-center justify-center p-0 overflow-hidden shadow-sm">
+                            <div className={`w-[100px] h-[100px] md:w-[130px] md:h-[130px] shrink-0 bg-white dark:bg-[#16181d] rounded-md flex items-center justify-center p-0 overflow-hidden shadow-sm ${(companyInfo.Hirer?.IsPRO || companyInfo.IsPRO) ? 'border-2 border-[#0095F6]' : 'border border-slate-100 dark:border-[#303340]'}`}>
                                 {companyInfo.ProfilePicture || companyInfo.LogoUrl ? (
                                     <img src={companyInfo.ProfilePicture || companyInfo.LogoUrl} alt={companyInfo.BusinessName} className="w-full h-full object-cover" />
                                 ) : (
@@ -389,6 +389,9 @@ const CompanyDetailsPage = () => {
                                 <div>
                                     <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight mb-2 flex items-center justify-center md:justify-start gap-3">
                                         {companyInfo.BusinessName}
+                                        {(companyInfo.Hirer?.IsPRO || companyInfo.IsPRO) && (
+                                            <CheckCircle2 size={24} className="text-[#0095F6] fill-[#0095F6]/10 shrink-0" title="Verified Business" />
+                                        )}
                                         {companyInfo.AverageRating > 0 && (
                                             <div className="flex items-center gap-1.5 bg-orange-50 dark:bg-orange-950/20 text-orange-500 px-3 py-1 rounded-full border border-orange-100 dark:border-orange-900/30">
                                                 <Star size={14} fill="currentColor" />

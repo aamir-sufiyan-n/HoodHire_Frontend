@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, LogOut, Settings, Save, MapPin, Briefcase, Phone, Mail, CheckCircle2, Building2, Globe, Users, Calendar, Sparkles, Camera } from 'lucide-react';
+import { User, LogOut, Settings, Save, MapPin, Briefcase, Phone, Mail, CheckCircle2, Building2, Globe, Users, Calendar, Sparkles, Camera, Crown } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { hirerAPI } from '../api/hirer';
 import Footer from './Footer';
@@ -20,6 +20,8 @@ const HirerProfilePage = () => {
     const [hasExistingProfile, setHasExistingProfile] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [isPicModalOpen, setIsPicModalOpen] = useState(false);
+    const [subscription, setSubscription] = useState(null);
+    const [subLoading, setSubLoading] = useState(false);
 
     const [formData, setFormData] = useState({
         full_name: '',
@@ -69,6 +71,17 @@ const HirerProfilePage = () => {
                     } else {
                         setIsEditing(true);
                     }
+                }
+                
+                // Fetch subscription status
+                setSubLoading(true);
+                try {
+                    const subRes = await hirerAPI.getSubscriptionStatus();
+                    setSubscription(subRes);
+                } catch (subErr) {
+                    console.error("Failed to fetch subscription:", subErr);
+                } finally {
+                    setSubLoading(false);
                 }
             } catch (err) {
                 console.log("No profile setup yet.");
@@ -226,13 +239,14 @@ const HirerProfilePage = () => {
                             {/* Avatar Ring */}
                             <div className="relative w-28 h-28 sm:w-36 sm:h-36 flex items-center justify-center mb-6">
                                 <div className="absolute inset-0 bg-gradient-to-br from-[#3b9f87] to-[#009966] rounded-full opacity-20 blur-md group-hover:opacity-30 transition-opacity"></div>
-                                <div className="w-[85%] h-[85%] bg-white dark:bg-[#1a1d24] rounded-full flex items-center justify-center overflow-hidden border-4 border-slate-50 dark:border-[#16181d] z-10 relative shadow-sm group-hover:scale-105 transition-transform duration-300">
+                                <div className={`w-[85%] h-[85%] bg-white dark:bg-[#1a1d24] rounded-full flex items-center justify-center overflow-hidden z-10 relative shadow-sm group-hover:scale-105 transition-transform duration-300 border-4 ${formData.is_pro ? 'border-[#0095F6]' : 'border-slate-50 dark:border-[#16181d]'}`}>
                                     <div className="w-full h-full bg-white dark:bg-[#007744]/30 flex items-center justify-center text-[#009966] dark:text-[#009966] relative">
                                         {formData.ProfilePicture ? (
                                             <img src={formData.ProfilePicture} alt="Profile" className="w-full h-full object-cover" />
                                         ) : (
                                             <Building2 size={46} strokeWidth={1.5} />
                                         )}
+                                        
 
                                         {/* Upload Overlay */}
                                         <div
@@ -245,7 +259,12 @@ const HirerProfilePage = () => {
                                 </div>
                             </div>
 
-                            <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white capitalize mb-1 tracking-tight">{formData.business_name || user?.username || 'Employer Name'}</h1>
+                            <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white capitalize mb-1 tracking-tight flex items-center justify-center gap-1.5">
+                                {formData.business_name || user?.username || 'Employer Name'}
+                                {formData.is_pro && (
+                                    <CheckCircle2 size={24} className="text-[#0095F6] fill-[#0095F6]/10 shrink-0" title="Verified Business" />
+                                )}
+                            </h1>
                             <div className="flex items-center justify-center gap-1.5 text-slate-500 dark:text-slate-400 text-sm font-medium mb-5">
                                 <Mail size={14} /> <span className="truncate">{user?.email}</span>
                             </div>
@@ -619,6 +638,105 @@ const HirerProfilePage = () => {
                                             <div>
                                                 <p className="text-xs text-slate-500 dark:text-slate-400 font-bold mb-1">Registered Address</p>
                                                 <p className="font-bold text-sm text-slate-900 dark:text-white leading-relaxed max-w-2xl">{formData.address ? `${formData.address}, ${formData.locality}, ${formData.city}` : 'Address details are incomplete.'}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Subscription Plan Block */}
+                                <div className="mt-8 bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-950/20 dark:to-[#16181d] p-6 sm:p-8 rounded-md border border-emerald-500/20 shadow-lg relative overflow-hidden group">
+                                    <div className="absolute top-[-20%] right-[-10%] w-[30%] h-[100%] bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"></div>
+                                    
+                                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8 relative z-10">
+                                        <div className="space-y-1">
+                                            <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-600 text-white text-[10px] font-bold rounded-full uppercase tracking-widest shadow-sm">
+                                                <Crown size={12} fill="currentColor" /> Active Plan
+                                            </div>
+                                            <h3 className="text-2xl font-extrabold text-slate-900 dark:text-white flex items-center gap-3">
+                                                {subscription?.subscribed ? subscription?.plan?.Name : 'Standard Plan'}
+                                            </h3>
+                                            <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">
+                                                Status: <span className={subscription?.status === 'active' ? 'text-emerald-600 font-bold capitalize' : 'text-slate-500 font-bold capitalize'}>
+                                                    {subscription?.status || 'Active'}
+                                                </span>
+                                            </p>
+                                        </div>
+                                        
+                                        <button 
+                                            onClick={() => navigate('/hirer/subscriptions')}
+                                            className="px-6 py-2.5 bg-white dark:bg-[#1a1d24] border border-emerald-500/40 text-emerald-600 dark:text-emerald-400 font-bold text-sm rounded-md shadow-sm hover:bg-emerald-50 dark:hover:bg-emerald-900/10 transition-all transform hover:-translate-y-0.5 active:scale-95 flex items-center gap-2"
+                                        >
+                                            <Sparkles size={16} /> Manage Plan
+                                        </button>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
+                                        <div className="bg-white/80 dark:bg-[#1a1d24]/60 p-5 rounded-md border border-slate-200/60 dark:border-white/5 shadow-sm">
+                                            <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3">Plan Details</p>
+                                            <div className="space-y-2">
+                                                <div className="flex justify-between items-center text-sm">
+                                                    <span className="text-slate-500 dark:text-slate-400 font-medium">Duration</span>
+                                                    <span className="text-slate-900 dark:text-white font-bold">{subscription?.subscribed ? `${subscription?.plan?.DurationDays} Days` : 'Unlimited'}</span>
+                                                </div>
+                                                {subscription?.subscribed && (
+                                                    <>
+                                                        <div className="flex justify-between items-center text-sm">
+                                                            <span className="text-slate-500 dark:text-slate-400 font-medium">Started On</span>
+                                                            <span className="text-slate-900 dark:text-white font-bold">{new Date(subscription?.start_date).toLocaleDateString()}</span>
+                                                        </div>
+                                                        <div className="flex justify-between items-center text-sm">
+                                                            <span className="text-slate-500 dark:text-slate-400 font-medium">Expiry Date</span>
+                                                            <span className="text-orange-600 dark:text-orange-400 font-bold">{new Date(subscription?.end_date).toLocaleDateString()}</span>
+                                                        </div>
+                                                    </>
+                                                )}
+                                                {!subscription?.subscribed && (
+                                                   <div className="flex justify-between items-center text-sm">
+                                                       <span className="text-slate-500 dark:text-slate-400 font-medium">Pricing</span>
+                                                       <span className="text-emerald-600 font-bold">Free</span>
+                                                   </div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div className="md:col-span-1 lg:col-span-2 bg-white/80 dark:bg-[#1a1d24]/60 p-5 rounded-md border border-slate-200/60 dark:border-white/5 shadow-sm">
+                                            <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3">Plan Advantages</p>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                {subscription?.subscribed ? (
+                                                    (subscription?.plan?.Advantages && subscription.plan.Advantages.length > 0) ? (
+                                                        subscription.plan.Advantages.map((adv, idx) => (
+                                                            <div key={idx} className="flex items-center gap-2.5 text-slate-700 dark:text-slate-300">
+                                                                <div className="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center shrink-0">
+                                                                    <CheckCircle2 size={12} className="text-emerald-600 dark:text-emerald-400" />
+                                                                </div>
+                                                                <span className="text-sm font-medium leading-tight">{adv.Text}</span>
+                                                            </div>
+                                                        ))
+                                                    ) : (
+                                                        <span className="text-sm text-slate-500 italic">None</span>
+                                                    )
+                                                ) : (
+                                                    <>
+                                                        <div className="flex items-center gap-2.5 text-slate-700 dark:text-slate-300">
+                                                            <div className="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center shrink-0">
+                                                                    <CheckCircle2 size={12} className="text-emerald-600 dark:text-emerald-400" />
+                                                            </div>
+                                                            <span className="text-sm font-medium leading-tight">Basic Job Search (Local)</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-2.5 text-slate-700 dark:text-slate-300">
+                                                            <div className="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center shrink-0">
+                                                                    <CheckCircle2 size={12} className="text-emerald-600 dark:text-emerald-400" />
+                                                            </div>
+                                                            <span className="text-sm font-medium leading-tight">Apply to 5 Jobs / Month</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-2.5 text-slate-700 dark:text-slate-300">
+                                                            <div className="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center shrink-0">
+                                                                    <CheckCircle2 size={12} className="text-emerald-600 dark:text-emerald-400" />
+                                                            </div>
+                                                            <span className="text-sm font-medium leading-tight">Limited Business Analytics</span>
+                                                        </div>
+                                                    </>
+                                                )}
                                             </div>
                                         </div>
                                     </div>

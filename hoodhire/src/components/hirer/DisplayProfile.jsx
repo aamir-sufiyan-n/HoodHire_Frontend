@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { User, MapPin, Mail, Phone, Calendar, Briefcase, GraduationCap, ArrowLeft, Loader2, Award, Clock, CheckCircle2, XCircle, MessageSquare, MoreVertical, Flag, MessageCircle } from 'lucide-react';
+import { User, MapPin, Mail, Phone, Calendar, Briefcase, GraduationCap, ArrowLeft, Loader2, Award, Clock, CheckCircle2, XCircle, MessageSquare, MoreVertical, Flag, MessageCircle, FileText } from 'lucide-react';
 import { hirerAPI } from '../../api/hirer';
 import { jobsAPI } from '../../api/jobs';
 import toast from 'react-hot-toast';
@@ -147,7 +147,8 @@ const DisplayProfile = () => {
         graduation_year: Education?.GraduationYear || profile?.Education?.GraduationYear || '',
         is_ongoing: Education?.IsOngoing || profile?.Education?.IsOngoing || false,
         interested_categories: (profile?.JobInterests || profile?.job_interests) ? (profile?.JobInterests || profile?.job_interests).map(ji => ji.Category?.Name || ji.category?.name).filter(Boolean) : (profile?.InterestedCategories || []),
-        profile_picture_url: profile?.ProfilePicture || profile?.profile_picture || profile?.ProfilePictureUrl || profile?.profile_picture_url || Seeker?.ProfilePicture || Seeker?.profile_picture || Seeker?.ProfilePictureUrl || Seeker?.profile_picture_url || ''
+        profile_picture_url: profile?.ProfilePicture || profile?.profile_picture || profile?.ProfilePictureUrl || profile?.profile_picture_url || Seeker?.ProfilePicture || Seeker?.profile_picture || Seeker?.ProfilePictureUrl || Seeker?.profile_picture_url || '',
+        resume_url: (application?.ResumeUrl || application?.Resume || Seeker?.ResumeUrl || profile?.ResumeUrl || '').replace('/image/upload/', '/raw/upload/')
     };
 
     const experiences = (WorkExperiences || profile?.WorkExperiences || []).map(ex => ({
@@ -366,6 +367,46 @@ const DisplayProfile = () => {
                         <p className="text-slate-700 dark:text-slate-300 italic font-medium relative z-10 leading-relaxed max-w-2xl">
                             "{location.state.applicationMessage}"
                         </p>
+                        {location.state?.applicationResume && (
+                            <div className="mt-4 flex items-center gap-3 relative z-10">
+                                {(() => {
+                                    const transformed = location.state.applicationResume.replace('/image/upload/', '/raw/upload/');
+                                    const fileName = transformed.split('/').pop().split('?')[0] || "View Submitted Resume";
+                                    return (
+                                        <a 
+                                            href={transformed} 
+                                            target="_blank" 
+                                            rel="noopener noreferrer"
+                                            className="flex items-center gap-2 px-4 py-2 bg-[#009966] hover:bg-[#008855] text-white text-[13px] font-bold rounded shadow-sm transition-all"
+                                            title={fileName}
+                                        >
+                                             {fileName}
+                                        </a>
+                                    );
+                                })()}
+                                <p className="text-[11px] text-slate-500 font-medium">This resume was attached specifically for this job.</p>
+                            </div>
+                        )}
+                        {!location.state?.applicationResume && application?.ResumeUrl && (
+                            <div className="mt-4 flex items-center gap-3 relative z-10">
+                                {(() => {
+                                    const transformed = application.ResumeUrl.replace('/image/upload/', '/raw/upload/');
+                                    const fileName = transformed.split('/').pop().split('?')[0] || "View Submitted Resume";
+                                    return (
+                                        <a 
+                                            href={transformed} 
+                                            target="_blank" 
+                                            rel="noopener noreferrer"
+                                            className="flex items-center gap-2 px-4 py-2 bg-[#009966] hover:bg-[#008855] text-white text-[13px] font-bold rounded shadow-sm transition-all"
+                                            title={fileName}
+                                        >
+                                             {fileName}
+                                        </a>
+                                    );
+                                })()}
+                                <p className="text-[11px] text-slate-500 font-medium">This resume was attached specifically for this job.</p>
+                            </div>
+                        )}
                     </div>
                 )}
 
@@ -394,6 +435,25 @@ const DisplayProfile = () => {
                                 )}
                             </p>
                         </div>
+
+                        {/* RESUME SECTION */}
+                        {formData.resume_url && (
+                             <div className="py-5 border-b border-slate-200/50 dark:border-[#262933]/50">
+                                <h3 className="text-[11px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3">
+                                    Profile Resume
+                                </h3>
+                                <a 
+                                    href={formData.resume_url} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-2 px-4 py-3 bg-slate-50 dark:bg-[#1a1d24] border border-slate-200 dark:border-[#303340] rounded text-slate-700 dark:text-slate-300 hover:text-[#009966] dark:hover:text-[#009966] transition-all group overflow-hidden"
+                                    title={formData.resume_url.split('/').pop().split('?')[0] || "Download Seeker's Profile Resume"}
+                                >
+                                    <FileText size={18} className="text-slate-400 group-hover:text-[#009966] shrink-0" />
+                                    <span className="text-[13px] font-bold truncate">{formData.resume_url.split('/').pop().split('?')[0] || "Download Seeker's Profile Resume"}</span>
+                                </a>
+                            </div>
+                        )}
 
                         {/* CATEGORIES SECTION */}
                         <div className="py-5 border-b border-slate-200/50 dark:border-[#262933]/50">

@@ -1,5 +1,5 @@
     import React from 'react';
-    import { User, Clock } from 'lucide-react';
+    import { User, Clock, CheckCircle2 } from 'lucide-react';
 
     const ConversationItem = ({ conversation, isSelected, onClick, isCollapsed }) => {
         const userId = conversation.user_id || conversation.UserID;
@@ -9,6 +9,7 @@
         const lastMessageTime = conversation.last_message_time || conversation.LastMessageTime;
         const unreadCount = conversation.unread_count ?? conversation.UnreadCount ?? 0;
         const isOnline = conversation.is_online || conversation.IsOnline;
+        const isPro = conversation.is_pro || conversation.IsPRO || conversation.PartyA?.IsPRO || conversation.PartyB?.IsPRO;
 
         const formatTime = (timeStr) => {
             if (!timeStr) return '';
@@ -40,7 +41,7 @@
                 }`}
             >
                 <div className="relative shrink-0">
-                    <div className={`${isCollapsed ? 'w-10 h-10' : 'w-12 h-12'} rounded-full overflow-hidden bg-slate-100 dark:bg-[#262933] border border-slate-200 dark:border-[#303340] flex items-center justify-center transition-all`}>
+                    <div className={`${isCollapsed ? 'w-10 h-10' : 'w-12 h-12'} rounded-full overflow-hidden bg-slate-100 dark:bg-[#262933] flex items-center justify-center transition-all ${isPro ? 'border-2 border-[#0095F6]' : 'border border-slate-200 dark:border-[#303340]'}`}>
                         {profilePicture ? (
                             <img src={profilePicture} alt={username} className="w-full h-full object-cover" />
                         ) : (
@@ -62,6 +63,9 @@
                         <div className="flex justify-between items-start mb-0.5">
                             <h3 className={`font-bold text-sm truncate ${isSelected ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-900 dark:text-white'}`}>
                                 {username || 'Anonymous User'}
+                                {isPro && (
+                                    <CheckCircle2 size={12} className="text-[#0095F6] fill-[#0095F6]/10 shrink-0 ml-1" />
+                                )}
                             </h3>
                             <span className="text-[10px] font-medium text-slate-400 shrink-0 whitespace-nowrap ml-2">
                                 {formatTime(lastMessageTime)}

@@ -228,10 +228,16 @@ export const jobsAPI = {
         return handleResponse(response);
     },
 
-    getMyApplications: async () => {
+    getMyApplications: async (status) => {
         const token = getToken();
         if (!token) throw new Error('No access token found');
-        const response = await fetch(`${API_BASE_URL}/seeker/applications`, {
+        
+        let url = `${API_BASE_URL}/seeker/applications`;
+        if (status && status !== 'all') {
+            url += `?status=${status}`;
+        }
+
+        const response = await fetch(url, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -267,5 +273,71 @@ export const jobsAPI = {
             credentials: 'include'
         });
         return handleResponse(response);
+    },
+
+    // ==========================================
+    // ADMIN ENDPOINTS
+    // ==========================================
+
+    /**
+     * Get all jobs (Admin) 
+     * @returns {Promise<Object>}
+     */
+    getAllJobsAdmin: async () => {
+        const token = getToken();
+        if (!token) throw new Error('No access token found');
+        const response = await fetch(`${API_BASE_URL}/admin/jobs`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            credentials: 'include'
+        });
+        return handleResponse(response);
+    },
+
+    /**
+     * Update job status (Admin)
+     * @param {number|string} id - The job ID
+     * @param {Object} statusData - Status data
+     * @returns {Promise<Object>}
+     */
+    updateJobStatusAdmin: async (id, statusData) => {
+        const token = getToken();
+        if (!token) throw new Error('No access token found');
+        const response = await fetch(`${API_BASE_URL}/admin/jobs/${id}/status`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(statusData),
+            credentials: 'include'
+        });
+        return handleResponse(response);
+    },
+
+    /**
+     * Export all jobs to PDF (Admin)
+     * @returns {Promise<Blob>}
+     */
+    exportJobsPDF: async () => {
+        const token = getToken();
+        if (!token) throw new Error('No access token found');
+        const response = await fetch(`${API_BASE_URL}/admin/jobs/export`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            credentials: 'include'
+        });
+        
+        if (!response.ok) {
+            const error = new Error('Failed to export jobs');
+            error.status = response.status;
+            throw error;
+        }
+        
+        return response.blob();
     }
 };

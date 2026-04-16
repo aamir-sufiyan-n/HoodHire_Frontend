@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Building2, MapPin, Briefcase, ExternalLink, Users, Star, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Building2, MapPin, Briefcase, ExternalLink, Users, Star, ArrowRight, ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
 import { jobsAPI } from '../api/jobs';
 import { seekerAPI } from '../api/seeker';
 import Footer from './Footer';
@@ -291,7 +291,7 @@ const CompaniesDirectory = () => {
                                                 className="bg-white dark:bg-[#16181d] border border-slate-200 dark:border-[#262933] rounded-md p-6 premium-shadow hover:shadow-md hover:-translate-y-1 transition-all duration-300 cursor-pointer group flex flex-col h-full"
                                             >
                                                 <div className="flex items-start gap-4 mb-5 relative">
-                                                    <div className="w-16 h-16 bg-slate-50 dark:bg-[#1a1d24] border border-slate-100 dark:border-[#303340] rounded-md flex items-center justify-center shadow-inner overflow-hidden flex-shrink-0">
+                                                    <div className={`w-16 h-16 bg-slate-50 dark:bg-[#1a1d24] rounded-md flex items-center justify-center shadow-inner overflow-hidden flex-shrink-0 ${(company.Hirer?.IsPRO || company.IsPRO) ? 'border-2 border-[#0095F6]' : 'border border-slate-100 dark:border-[#303340]'}`}>
                                                         {(company.ProfilePicture || company.LogoUrl) ? (
                                                             <img src={company.ProfilePicture || company.LogoUrl} alt={company.BusinessName} className="w-full h-full object-cover" />
                                                         ) : (
@@ -340,8 +340,11 @@ const CompaniesDirectory = () => {
                                                 </div>
 
                                                 <div className="flex-1">
-                                                    <h3 className="text-xl font-extrabold text-slate-900 dark:text-white mb-1 group-hover:text-[#009966] transition-colors line-clamp-1">
+                                                    <h3 className="text-xl font-extrabold text-slate-900 dark:text-white mb-1 group-hover:text-[#009966] transition-colors line-clamp-1 flex items-center gap-1.5">
                                                         {company.BusinessName}
+                                                        {(company.Hirer?.IsPRO || company.IsPRO) && (
+                                                            <CheckCircle2 size={16} className="text-[#0095F6] fill-[#0095F6]/10 shrink-0" title="Verified Business" />
+                                                        )}
                                                     </h3>
                                                     <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-4 flex items-center gap-1.5">
                                                         <MapPin size={14} /> {company.Locality || company.City || 'Multiple Locations'}

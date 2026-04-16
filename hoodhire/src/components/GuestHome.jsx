@@ -11,14 +11,21 @@ const GuestHome = () => {
         return localStorage.getItem('theme') === 'dark';
     });
     const [isScrolled, setIsScrolled] = useState(false);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [searchLocation, setSearchLocation] = useState('');
 
-    const userStr = localStorage.getItem('user');
-    const user = userStr ? JSON.parse(userStr) : null;
+    const scrollToSection = (id) => {
+        const element = document.getElementById(id);
+        if (element) {
+            const offset = 80; // Navbar height
+            const bodyRect = document.body.getBoundingClientRect().top;
+            const elementRect = element.getBoundingClientRect().top;
+            const elementPosition = elementRect - bodyRect;
+            const offsetPosition = elementPosition - offset;
 
-    const handleSearchSubmit = () => {
-        navigate('/jobs', { state: { search: searchTerm, location: searchLocation } });
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            });
+        }
     };
 
     useEffect(() => {
@@ -76,38 +83,31 @@ const GuestHome = () => {
                     </div>
 
                     {/* Full Search Bar in Navbar */}
-                    <div className={`hidden lg:flex flex-1 max-w-2xl mx-auto rounded-full border p-1.5 items-center gap-2 transition-all shadow-sm hover:shadow-md ${isScrolled ? 'bg-white/80 dark:bg-[#16181d]/50 backdrop-blur-md border-slate-200 dark:border-white/20 focus-within:border-emerald-500/50' : 'bg-white/10 dark:bg-[#16181d]/50 backdrop-blur-xl border-white/20 dark:border-[#303340] focus-within:border-white/40'}`}>
-                        <div className="flex-1 flex items-center px-4">
-                            <Search className={`h-4 w-4 mr-2 flex-shrink-0 ${isScrolled ? 'text-slate-500 dark:text-white/70' : 'text-white/70'}`} />
-                            <input
-                                type="text"
-                                placeholder="Job title, keywords..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter') handleSearchSubmit();
-                                }}
-                                className={`w-full bg-transparent border-none outline-none text-sm py-1.5 ${isScrolled ? 'text-slate-900 dark:text-[#f8fafc] placeholder:text-slate-500 dark:placeholder:text-white/70' : 'text-white placeholder:text-white/70'}`}
-                            />
-                        </div>
-                        <div className={`w-px h-6 ${isScrolled ? 'bg-slate-200 dark:bg-white/20' : 'bg-white/20 dark:bg-[#303340]'}`}></div>
-                        <div className="flex-1 flex items-center px-4">
-                            <MapPin className={`h-4 w-4 mr-2 flex-shrink-0 ${isScrolled ? 'text-slate-500 dark:text-white/70' : 'text-white/70'}`} />
-                            <input
-                                type="text"
-                                placeholder="Neighborhood, City..."
-                                value={searchLocation}
-                                onChange={(e) => setSearchLocation(e.target.value)}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter') handleSearchSubmit();
-                                }}
-                                className={`w-full bg-transparent border-none outline-none text-sm py-1.5 ${isScrolled ? 'text-slate-900 dark:text-[#f8fafc] placeholder:text-slate-500 dark:placeholder:text-white/70' : 'text-white placeholder:text-white/70'}`}
-                            />
-                        </div>
-                        <button
-                            onClick={handleSearchSubmit}
-                            className={`px-6 py-2 font-bold rounded-full transition-all text-sm flex-shrink-0 shadow-md transform hover:-translate-y-[1px] ${isScrolled ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-white hover:bg-slate-100 text-emerald-800'}`}>
-                            Search
+                    {/* Navigation Links in Navbar */}
+                    <div className="hidden lg:flex flex-1 max-w-2xl mx-auto items-center justify-center gap-8 py-1.5">
+                        <button 
+                            onClick={() => scrollToSection('how-it-works')} 
+                            className={`text-sm font-bold transition-all hover:scale-105 active:scale-95 ${isScrolled ? 'text-slate-600 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-500' : 'text-white/80 hover:text-white'}`}
+                        >
+                            How it Works
+                        </button>
+                        <button 
+                            onClick={() => scrollToSection('why-us')} 
+                            className={`text-sm font-bold transition-all hover:scale-105 active:scale-95 ${isScrolled ? 'text-slate-600 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-500' : 'text-white/80 hover:text-white'}`}
+                        >
+                            Why Us
+                        </button>
+                        <button 
+                            onClick={() => navigate('/jobs')} 
+                            className={`text-sm font-bold transition-all hover:scale-105 active:scale-95 ${isScrolled ? 'text-slate-600 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-500' : 'text-white/80 hover:text-white'}`}
+                        >
+                            Find Jobs
+                        </button>
+                        <button 
+                            onClick={() => navigate('/companies')} 
+                            className={`text-sm font-bold transition-all hover:scale-105 active:scale-95 ${isScrolled ? 'text-slate-600 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-500' : 'text-white/80 hover:text-white'}`}
+                        >
+                            Companies
                         </button>
                     </div>
 
@@ -245,7 +245,7 @@ const GuestHome = () => {
 
 
                 {/* HOW IT WORKS */}
-                <section className="py-16 bg-[#EBF5F4] dark:bg-[#1a1d24]">
+                <section id="how-it-works" className="py-16 bg-[#EBF5F4] dark:bg-[#1a1d24]">
                     <div className="max-w-7xl mx-auto px-4 lg:px-8 text-center mb-12">
                         <h2 className="text-3xl md:text-5xl font-extrabold text-slate-900 dark:text-white mb-6 tracking-tight">How HoodHire Works.</h2>
                         <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto font-medium text-lg leading-relaxed">Discover a simple way to take the next step in your career. From finding the right job to connecting with employers, everything happens in just a few easy steps.</p>
@@ -351,7 +351,7 @@ const GuestHome = () => {
                 </section>
 
                 {/* BOTTOM CTA - STATS */}
-                <section className="py-16 max-w-7xl mx-auto px-4">
+                <section id="why-us" className="py-16 max-w-7xl mx-auto px-4">
                     <div className="text-center mb-12">
                         <h2 className="text-2xl md:text-4xl font-extrabold text-slate-900 dark:text-white mb-2 tracking-tight">Why choose HoodHire?</h2>
                         <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto font-medium text-lg">We've built the easiest way to manage local employment, whether you're hiring for your shop or looking for weekend work.</p>

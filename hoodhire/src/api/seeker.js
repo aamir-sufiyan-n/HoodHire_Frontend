@@ -523,6 +523,17 @@ export const seekerAPI = {
     },
 
     /**
+     * Get statistics for all job categories
+     * @returns {Promise<Object>}
+     */
+    getCategoryStats: async () => {
+        const response = await fetch(`${API_BASE_URL}/categories/stats`, {
+            method: 'GET',
+            credentials: 'include'
+        });
+        return handleResponse(response);
+    },
+    /**
      * Get accepted bonds (connections) for the seeker
      * @returns {Promise<Object>}
      */
@@ -530,6 +541,40 @@ export const seekerAPI = {
         const token = getToken();
         const response = await fetch(`${API_BASE_URL}/seeker/bonds`, {
             method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            credentials: 'include'
+        });
+        return handleResponse(response);
+    },
+
+    /**
+     * Upload or update the seeker's resume
+     * @param {FormData} formData - Contains the 'resume' file
+     * @returns {Promise<Object>}
+     */
+    uploadResume: async (formData) => {
+        const token = getToken();
+        const response = await fetch(`${API_BASE_URL}/seeker/resume`, {
+            method: 'PATCH',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            credentials: 'include',
+            body: formData,
+        });
+        return handleResponse(response);
+    },
+
+    /**
+     * Delete the seeker's resume
+     * @returns {Promise<Object>}
+     */
+    deleteResume: async () => {
+        const token = getToken();
+        const response = await fetch(`${API_BASE_URL}/seeker/resume`, {
+            method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${token}`
             },

@@ -213,8 +213,8 @@ const JobDetails = () => {
                         {/* Left: Job Title, Company, Info inline */}
                         <div className="flex gap-4 md:gap-5 items-start">
                             <div className="mt-1 w-[50px] h-[50px] md:w-[60px] md:h-[60px] shrink-0 bg-transparent flex items-center justify-center relative">
-                                <div className="absolute inset-0 bg-gradient-to-tr from-rose-400 via-fuchsia-500 to-indigo-500 rounded-full blur-[2px] opacity-80"></div>
-                                <div className="relative w-full h-full bg-white dark:bg-[#1a1d24] rounded-full border border-slate-100 dark:border-[#303340] flex items-center justify-center shadow-sm overflow-hidden">
+                                <div className={`absolute inset-0 bg-gradient-to-tr ${(job.Business?.Hirer?.IsPRO || job.Business?.IsPRO) ? 'from-blue-400 via-[#0095F6] to-blue-600' : 'from-rose-400 via-fuchsia-500 to-indigo-500'} rounded-full blur-[2px] opacity-80`}></div>
+                                <div className={`relative w-full h-full bg-white dark:bg-[#1a1d24] rounded-full flex items-center justify-center shadow-sm overflow-hidden ${(job.Business?.Hirer?.IsPRO || job.Business?.IsPRO) ? 'border-2 border-[#0095F6]' : 'border border-slate-100 dark:border-[#303340]'}`}>
                                     {(job.Business?.ProfilePicture || job.Business?.Hirer?.ProfilePicture || job.Hirer?.ProfilePicture || job.ProfilePicture) ? (
                                         <img
                                             src={job.Business?.ProfilePicture || job.Business?.Hirer?.ProfilePicture || job.Hirer?.ProfilePicture || job.ProfilePicture}
@@ -233,10 +233,13 @@ const JobDetails = () => {
                                     {job.Description?.Title}
                                 </h1>
                                 <p
-                                    className="text-[15px] font-bold text-[#134074] mb-4 block cursor-pointer hover:underline decoration-2 underline-offset-4 transition-all"
+                                    className="text-[15px] font-bold text-[#134074] mb-4 flex items-center gap-1.5 cursor-pointer hover:underline decoration-2 underline-offset-4 transition-all"
                                     onClick={() => navigate(`/companies/${job.Business?.ID}`)}
                                 >
                                     {job.Business?.BusinessName}
+                                    {(job.Business?.Hirer?.IsPRO || job.Business?.IsPRO) && (
+                                        <CheckCircle2 size={16} className="text-[#0095F6] fill-[#0095F6]/10 shrink-0" title="Verified Business" />
+                                    )}
                                 </p>
                                 <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-[13px] font-bold text-slate-500 dark:text-slate-400">
                                     <span className="flex items-center gap-2"><Briefcase size={16} strokeWidth={2} className="text-[#3b9f87]" /> {job.Category?.DisplayName || 'General'}</span>
@@ -362,7 +365,7 @@ const JobDetails = () => {
                                                     <div>
                                                         <div className="flex justify-between items-start mb-3">
                                                             <div className="flex items-center gap-3">
-                                                                <div className="w-12 h-12 shrink-0 bg-white dark:bg-[#1a1d24] border border-slate-100 dark:border-[#303340] rounded-md flex items-center justify-center shadow-sm overflow-hidden">
+                                                                <div className={`w-12 h-12 shrink-0 bg-white dark:bg-[#1a1d24] rounded-md flex items-center justify-center shadow-sm overflow-hidden ${(rjob.Business?.Hirer?.IsPRO || rjob.Business?.IsPRO) ? 'border-2 border-[#0095F6]' : 'border border-slate-100 dark:border-[#303340]'}`}>
                                                                     {(rjob.Business?.ProfilePicture || rjob.Business?.Hirer?.ProfilePicture || rjob.Hirer?.ProfilePicture || rjob.ProfilePicture) ? (
                                                                         <img
                                                                             src={rjob.Business?.ProfilePicture || rjob.Business?.Hirer?.ProfilePicture || rjob.Hirer?.ProfilePicture || rjob.ProfilePicture}
@@ -376,8 +379,11 @@ const JobDetails = () => {
                                                                     )}
                                                                 </div>
                                                                 <div>
-                                                                    <h4 className="text-sm font-bold text-slate-900 dark:text-white capitalize group-hover:text-[#3b9f87] transition-colors">
+                                                                    <h4 className="text-sm font-bold text-slate-900 dark:text-white capitalize group-hover:text-[#3b9f87] transition-colors flex items-center gap-1.5">
                                                                         {rjob.Description?.Title}
+                                                                        {(rjob.Business?.Hirer?.IsPRO || rjob.Business?.IsPRO) && (
+                                                                            <CheckCircle2 size={14} className="text-[#0095F6] fill-[#0095F6]/10 shrink-0" />
+                                                                        )}
                                                                     </h4>
                                                                     <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
                                                                         {rjob.Business?.BusinessName}
@@ -468,8 +474,8 @@ const JobDetails = () => {
 
                                 <div className="flex items-center gap-4 mb-5">
                                     <div className="w-[50px] h-[50px] shrink-0 bg-transparent flex items-center justify-center relative">
-                                        <div className="absolute inset-0 bg-gradient-to-tr from-rose-400 via-fuchsia-500 to-indigo-500 rounded-full blur-[2px] opacity-80"></div>
-                                        <div className="relative w-full h-full bg-white dark:bg-[#1a1d24] rounded-full border border-slate-100 dark:border-[#303340] flex items-center justify-center shadow-sm overflow-hidden">
+                                        <div className={`absolute inset-0 bg-gradient-to-tr ${(job.Business?.Hirer?.IsPRO || job.Business?.IsPRO) ? 'from-blue-400 via-[#0095F6] to-blue-600' : 'from-rose-400 via-fuchsia-500 to-indigo-500'} rounded-full blur-[2px] opacity-80`}></div>
+                                        <div className={`relative w-full h-full bg-white dark:bg-[#1a1d24] rounded-full flex items-center justify-center shadow-sm overflow-hidden ${(job.Business?.Hirer?.IsPRO || job.Business?.IsPRO) ? 'border-2 border-[#0095F6]' : 'border border-slate-100 dark:border-[#303340]'}`}>
                                             {(job.Business?.ProfilePicture || job.Business?.Hirer?.ProfilePicture || job.Hirer?.ProfilePicture || job.ProfilePicture) ? (
                                                 <img
                                                     src={job.Business?.ProfilePicture || job.Business?.Hirer?.ProfilePicture || job.Hirer?.ProfilePicture || job.ProfilePicture}
@@ -485,10 +491,13 @@ const JobDetails = () => {
                                     </div>
                                     <div>
                                         <h3
-                                            className="text-[16px] font-extrabold text-slate-900 dark:text-white mb-1 tracking-tight cursor-pointer hover:text-[#134074] transition-colors"
+                                            className="text-[16px] font-extrabold text-slate-900 dark:text-white mb-1 tracking-tight cursor-pointer hover:text-[#134074] transition-colors flex items-center gap-1.5"
                                             onClick={() => navigate(`/companies/${job.Business?.ID}`)}
                                         >
                                             {job.Business?.BusinessName || 'Company Name'}
+                                            {(job.Business?.Hirer?.IsPRO || job.Business?.IsPRO) && (
+                                                <CheckCircle2 size={16} className="text-[#0095F6] fill-[#0095F6]/10 shrink-0" title="Verified Business" />
+                                            )}
                                         </h3>
                                         <p className="text-[12px] font-medium text-slate-500 dark:text-slate-400 flex flex-wrap gap-x-3 gap-y-1">
                                             <span className="flex items-center gap-1"><Users size={12} /> {job.Business?.EmployeeCount || '1-10'} Employees</span>
@@ -540,6 +549,10 @@ const JobDetails = () => {
                 onClose={() => setIsApplyModalOpen(false)}
                 jobId={job.ID}
                 jobTitle={job.Description?.Title}
+                isResumeRequired={job.Description?.ResumeRequired}
+                onSuccess={() => setHasApplied(true)}
+                businessName={job.Business?.BusinessName}
+                isPro={job.Business?.Hirer?.IsPRO || job.Business?.IsPRO}
             />
             {user?.role === 'hirer' && (
                 <PostJobModal

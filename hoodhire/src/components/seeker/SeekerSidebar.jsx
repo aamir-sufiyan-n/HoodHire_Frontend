@@ -9,18 +9,18 @@ const SeekerSidebar = ({ profileData, user, currentRoute }) => {
     const [unreadCount, setUnreadCount] = React.useState(0);
 
     React.useEffect(() => {
-        const fetchFollowingInfo = async () => {
-            if (user?.role === 'seeker') {
-                try {
-                    const res = await seekerAPI.getFollowedBusinesses();
-                    const list = Array.isArray(res) ? res : (res.businesses || []);
-                    setFollowingCount(list.length || 0);
-                } catch (err) {
-                    console.log("Failed to fetch following data", err);
-                }
-            }
-        };
-        fetchFollowingInfo();
+        // const fetchFollowingInfo = async () => {
+        //     if (user?.role === 'seeker') {
+        //         try {
+        //             const res = await seekerAPI.getFollowedBusinesses();
+        //             const list = Array.isArray(res) ? res : (res.businesses || []);
+        //             setFollowingCount(list.length || 0);
+        //         } catch (err) {
+        //             console.log("Failed to fetch following data", err);
+        //         }
+        //     }
+        // };
+        // fetchFollowingInfo();
 
         // Fetch initial unread count
         const fetchUnread = async () => {

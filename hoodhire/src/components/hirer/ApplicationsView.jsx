@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Briefcase, Users, CheckCircle, XCircle, Clock, User, MessageSquare, Loader2, ExternalLink, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, MessageCircle } from 'lucide-react';
+import { Briefcase, Users, CheckCircle, XCircle, Clock, User, MessageSquare, Loader2, ExternalLink, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, MessageCircle, FileText } from 'lucide-react';
 import { jobsAPI } from '../../api/jobs';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -185,7 +185,14 @@ const ApplicationsView = () => {
                                                         </div>
                                                         <div className="flex-1">
                                                             <h4
-                                                                onClick={() => navigate(`/hirer/seeker/${app.Seeker?.UserID || app.SeekerID}`, { state: { applicationStatus: app.Status, applicationMessage: app.Message, applicationId: app.ID } })}
+                                                                onClick={() => navigate(`/hirer/seeker/${app.Seeker?.UserID || app.SeekerID}`, { 
+                                                                    state: { 
+                                                                        applicationStatus: app.Status, 
+                                                                        applicationMessage: app.Message, 
+                                                                        applicationResume: app.ResumeUrl,
+                                                                        applicationId: app.ID 
+                                                                    } 
+                                                                })}
                                                                 className="font-bold text-slate-900 dark:text-white text-[15px] flex items-center gap-1.5 cursor-pointer hover:text-[#009966] transition-colors group/name"
                                                             >
                                                                 {app.Seeker?.FullName || app.Seeker?.full_name || app.Seeker?.DisplayName || 'Applicant'}
@@ -204,6 +211,26 @@ const ApplicationsView = () => {
                                                                 <span className="w-0.5 h-0.5 rounded-full bg-slate-300 dark:bg-slate-600"></span>
                                                                 <span className="flex items-center gap-1"><Clock size={12} /> {new Date(app.CreatedAt).toLocaleDateString()}</span>
                                                             </p>
+
+                                                            {app.ResumeUrl && (
+                                                                <div className="mt-2 flex items-center gap-2">
+                                                                    {(() => {
+                                                                        const transformedResume = app.ResumeUrl.replace('/image/upload/', '/raw/upload/');
+                                                                        const fileName = transformedResume.split('/').pop().split('?')[0] || "View Resume";
+                                                                        return (
+                                                                            <a 
+                                                                                href={transformedResume} 
+                                                                                target="_blank" 
+                                                                                rel="noopener noreferrer"
+                                                                                className="text-[11px] font-bold text-blue-600 hover:text-blue-700 bg-blue-50 dark:bg-blue-500/10 px-2.5 py-1 rounded flex items-center gap-1.5 transition-colors max-w-[200px] truncate"
+                                                                                title={fileName}
+                                                                            >
+                                                                                <FileText size={12} className="shrink-0" /> {fileName}
+                                                                            </a>
+                                                                        );
+                                                                    })()}
+                                                                </div>
+                                                            )}
 
                                                             {app.Message && (
                                                                 <div className="mt-2 bg-slate-50 dark:bg-[#16181d] p-2 rounded border border-slate-100 dark:border-[#262933]">
@@ -252,7 +279,14 @@ const ApplicationsView = () => {
                                                         )}
 
                                                         <button
-                                                            onClick={() => navigate(`/hirer/seeker/${app.SeekerID}`, { state: { applicationStatus: app.Status, applicationMessage: app.Message, applicationId: app.ID } })}
+                                                            onClick={() => navigate(`/hirer/seeker/${app.Seeker?.UserID || app.SeekerID}`, { 
+                                                                state: { 
+                                                                    applicationStatus: app.Status, 
+                                                                    applicationMessage: app.Message, 
+                                                                    applicationResume: app.ResumeUrl,
+                                                                    applicationId: app.ID 
+                                                                } 
+                                                            })}
                                                             className="w-full mt-1 flex items-center justify-center gap-1 px-3 py-1.5 border border-slate-200 dark:border-[#303340] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-[#262933] rounded text-[11px] font-bold transition-colors bg-white dark:bg-[#1a1d24] shadow-sm"
                                                         >
                                                             Details <ExternalLink size={12} />

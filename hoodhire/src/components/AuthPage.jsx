@@ -53,7 +53,13 @@ const AuthPage = ({ defaultView = 'login', role = null }) => {
             }
 
             toast.success('Successfully logged in!');
-            if (data.user && ((data.user.role || data.user.Role)?.toLowerCase() === 'admin')) {
+            const permsData = await authAPI.getMyPermissions();
+            console.log(permsData);
+            const permissions = permsData.permissions || {};
+            const hasAdminAccess = Object.values(permissions).some(val => val === true);
+            console.log('hasAdminAccess:', hasAdminAccess);
+
+            if (hasAdminAccess) {
                 navigate('/admin/dashboard');
             } else {
                 const userRole = (data.user?.role || data.user?.Role)?.toLowerCase();
@@ -226,7 +232,7 @@ const AuthPage = ({ defaultView = 'login', role = null }) => {
 
                                     {errorMsg && (
                                         <div className="mb-5 flex items-start gap-2.5 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 text-red-600 dark:text-red-400 text-sm font-medium px-4 py-3 rounded-md">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
                                             {errorMsg}
                                         </div>
                                     )}
@@ -323,7 +329,7 @@ const AuthPage = ({ defaultView = 'login', role = null }) => {
 
                                     {errorMsg && (
                                         <div className="mb-4 flex items-start gap-2.5 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 text-red-600 dark:text-red-400 text-sm font-medium px-4 py-3 rounded-md">
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
                                             {errorMsg}
                                         </div>
                                     )}

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Search, User, Briefcase, Building2, DollarSign, Navigation,
-    Home, ChevronRight, Star, MapPin, MessageSquare, TrendingUp, Compass, Sparkles, Clock
+    Home, ChevronRight, Star, MapPin, MessageSquare, TrendingUp, Compass, Sparkles, Clock, CheckCircle2
 } from 'lucide-react';
 import { seekerAPI } from '../api/seeker';
 import { jobsAPI } from '../api/jobs';
@@ -43,12 +43,13 @@ const SeekerHome = () => {
         const fetchDashboardData = async () => {
             if (user?.role === 'seeker') {
                 try {
-                    const [profileRes, jobsRes, appsRes, bizRes, favRes] = await Promise.all([
+                    const [profileRes, jobsRes, appsRes, bizRes, favRes, catStatsRes] = await Promise.all([
                         seekerAPI.getSeekerProfile().catch(() => null),
                         jobsAPI.getAllJobs().catch(() => null),
                         jobsAPI.getMyApplications().catch(() => null),
                         jobsAPI.getAllBusinesses().catch(() => null),
-                        seekerAPI.getFavoriteBusinesses().catch(() => ({ saved: [] }))
+                        seekerAPI.getFavoriteBusinesses().catch(() => ({ saved: [] })),
+                        seekerAPI.getCategoryStats().catch(() => null)
                     ]);
 
                     if (profileRes?.profile) setProfileData(profileRes.profile);
@@ -87,8 +88,12 @@ const SeekerHome = () => {
                         setTopCompanies(businessesWithCounts.slice(0, 3));
                     }
 
-                    // Compute Trending Categories based on allJobs
-                    if (allJobs.length > 0) {
+
+                    // Use fetched Category Stats if available
+                    if (catStatsRes?.categories) {
+                        setTrendingCategories(catStatsRes.categories.slice(0, 5));
+                    } else if (allJobs.length > 0) {
+                        // Fallback to local computation if API fails
                         const categoryCounts = allJobs.reduce((acc, job) => {
                             if (job.Category) {
                                 const catName = job.Category.DisplayName || job.Category.Name;
@@ -101,8 +106,8 @@ const SeekerHome = () => {
 
                         const sortedCategories = Object.entries(categoryCounts)
                             .sort((a, b) => b[1] - a[1]) // highest count first
-                            .map(entry => ({ name: entry[0], count: entry[1] }))
-                            .slice(0, 8); // Top 8
+                            .map(entry => ({ display_name: entry[0], job_count: entry[1] }))
+                            .slice(0, 5); // Top 5
 
                         setTrendingCategories(sortedCategories);
                     }
@@ -198,7 +203,15 @@ const SeekerHome = () => {
                         >
                             <p className="text-sm font-bold text-slate-700 dark:text-slate-300 group-hover:text-[#009966] transition-colors">{user?.username || 'Profile'}</p>
                             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#009966] to-[#007744] flex items-center justify-center overflow-hidden shadow-inner shrink-0">
-                                <User size={16} className="text-white" />
+                                {profileData?.ProfilePicture || profileData?.profile_picture || profileData?.profile_picture_url || profileData?.ProfilePictureUrl || profileData?.Seeker?.ProfilePicture ? (
+                                    <img 
+                                        src={profileData.ProfilePicture || profileData.profile_picture || profileData.profile_picture_url || profileData.ProfilePictureUrl || profileData.Seeker?.ProfilePicture} 
+                                        alt="Profile" 
+                                        className="w-full h-full object-cover"
+                                    />
+                                ) : (
+                                    <User size={16} className="text-white" />
+                                )}
                             </div>
                         </button>
                     </div>
@@ -268,7 +281,7 @@ const SeekerHome = () => {
                                 <div className="flex flex-col gap-5">
                                     {matchedJobs.map(job => (
                                         <div key={job.ID} onClick={() => handleApplyClick(job.ID)} className="bg-white dark:bg-[#16181d] border border-slate-200 dark:border-[#262933] rounded-sm premium-shadow p-5 shadow-sm hover:shadow-md hover:border-[#7ddfba] dark:hover:border-[#007744] transition-all cursor-pointer group flex flex-col sm:flex-row gap-5">
-                                            <div className="w-16 h-16 shrink-0 bg-slate-50 dark:bg-[#1a1d24] border border-slate-100 dark:border-[#303340] rounded-sm premium-shadow flex items-center justify-center shadow-sm overflow-hidden">
+                                            <div className={`w-16 h-16 shrink-0 bg-slate-50 dark:bg-[#1a1d24] rounded-sm premium-shadow flex items-center justify-center shadow-sm overflow-hidden ${(job.Business?.Hirer?.IsPRO || job.Business?.IsPRO) ? 'border-2 border-[#0095F6]' : 'border border-slate-100 dark:border-[#303340]'}`}>
                                                 {(job.Business?.ProfilePicture || job.Business?.Hirer?.ProfilePicture || job.Hirer?.ProfilePicture || job.ProfilePicture) ? (
                                                     <img 
                                                         src={job.Business?.ProfilePicture || job.Business?.Hirer?.ProfilePicture || job.Hirer?.ProfilePicture || job.ProfilePicture} 
@@ -288,7 +301,13 @@ const SeekerHome = () => {
                                                         <span className="text-[10px] uppercase tracking-wider font-bold bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 px-2 py-1 rounded-full border border-blue-100 dark:border-blue-800/30">Applied</span>
                                                     ) : null}
                                                 </div>
-                                                <p className="text-sm font-semibold text-slate-600 dark:text-slate-400 mb-2">{job.Business?.BusinessName} • <span className="font-medium text-slate-500">{job.Business?.Locality || 'Local'}</span></p>
+                                                <p className="text-sm font-semibold text-slate-600 dark:text-slate-400 mb-2 flex items-center gap-1.5">
+                                                    {job.Business?.BusinessName}
+                                                    {(job.Business?.Hirer?.IsPRO || job.Business?.IsPRO) && (
+                                                        <CheckCircle2 size={14} className="text-[#0095F6] fill-[#0095F6]/10 shrink-0" title="Verified Business" />
+                                                    )}
+                                                    • <span className="font-medium text-slate-500">{job.Business?.Locality || 'Local'}</span>
+                                                </p>
                                                 <div className="flex flex-wrap items-center gap-2 mb-3">
                                                     {job.Category && (
                                                         <span className="text-xs font-bold px-2 py-1 bg-slate-100 dark:bg-[#262933] text-slate-600 dark:text-slate-300 rounded-md capitalize">
@@ -396,9 +415,9 @@ const SeekerHome = () => {
                                     ) : trendingCategories.length > 0 ? (
                                         trendingCategories.map((cat, i) => (
                                             <span key={i} className="px-3 py-1.5 bg-slate-100 dark:bg-[#262933] text-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold hover:bg-[#dff5ea] dark:hover:bg-emerald-900/40 hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer transition-colors border border-transparent hover:border-[#bdf0d9] dark:hover:border-[#007744]/50 flex items-center gap-2">
-                                                {cat.name}
+                                                {cat.display_name || cat.name}
                                                 <span className="text-[10px] bg-white/50 dark:bg-black/20 px-1.5 py-0.5 rounded-full text-emerald-600 dark:text-emerald-400 font-bold">
-                                                    {cat.count}
+                                                    {cat.job_count}
                                                 </span>
                                             </span>
                                         ))
@@ -420,7 +439,7 @@ const SeekerHome = () => {
                                         <p className="text-xs text-slate-500 dark:text-slate-400">Loading top employers...</p>
                                     ) : topCompanies.length > 0 ? topCompanies.map((company, i) => (
                                         <div key={company.ID} onClick={() => navigate(`/companies/${company.ID}`)} className="flex items-center gap-3 group cursor-pointer transition-all hover:translate-x-1">
-                                            <div className="w-10 h-10 bg-slate-100 dark:bg-[#262933] rounded-sm premium-shadow flex items-center justify-center overflow-hidden border border-slate-200 dark:border-[#303340] group-hover:border-[#7ddfba] dark:group-hover:border-[#007744] transition-colors shrink-0">
+                                            <div className={`w-10 h-10 bg-slate-100 dark:bg-[#262933] rounded-sm premium-shadow flex items-center justify-center overflow-hidden group-hover:border-[#7ddfba] dark:group-hover:border-[#007744] transition-colors shrink-0 ${(company.Hirer?.IsPRO || company.IsPRO) ? 'border-2 border-[#0095F6]' : 'border border-slate-200 dark:border-[#303340]'}`}>
                                                 {(company.ProfilePicture || company.LogoUrl) ? (
                                                     <img src={company.ProfilePicture || company.LogoUrl} alt={company.BusinessName} className="w-full h-full object-cover" />
                                                 ) : (
@@ -430,7 +449,12 @@ const SeekerHome = () => {
                                                 )}
                                             </div>
                                             <div className="overflow-hidden">
-                                                <h4 className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-[#008855] dark:group-hover:text-[#009966] transition-colors truncate">{company.BusinessName}</h4>
+                                                <h4 className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-[#008855] dark:group-hover:text-[#009966] transition-colors truncate flex items-center gap-1.5">
+                                                    {company.BusinessName}
+                                                    {(company.Hirer?.IsPRO || company.IsPRO) && (
+                                                        <CheckCircle2 size={12} className="text-[#0095F6] fill-[#0095F6]/10 shrink-0" title="Verified Business" />
+                                                    )}
+                                                </h4>
                                                 <p className="text-xs font-medium text-slate-500 dark:text-slate-400 truncate">Hiring {company.openRolesCount} active roles</p>
                                             </div>
                                         </div>

@@ -22,6 +22,7 @@ import ExperienceView from './profile/ExperienceView';
 import SupportTickets from './seeker/SupportTickets';
 import SavedJobs from './seeker/SavedJobs';
 import FavoriteBusinesses from './seeker/FavoriteBusinesses';
+import ResumeManagement from './seeker/ResumeManagement';
 
 const ProfilePage = () => {
     const navigate = useNavigate();
@@ -149,7 +150,8 @@ const ProfilePage = () => {
         about: '',
         interested_categories: [],
         profile_picture_url: '',
-        ProfilePicture: ''
+        ProfilePicture: '',
+        resume_url: '',
     });
     const [formErrors, setFormErrors] = useState({});
 
@@ -181,7 +183,8 @@ const ProfilePage = () => {
                         interested_categories: (p.JobInterests || p.job_interests) ? (p.JobInterests || p.job_interests).map(ji => {
                             const cat = ji.Category || ji.category;
                             return cat ? (cat.Name || cat.name) : null;
-                        }).filter(Boolean) : (p.InterestedCategories || p.interested_categories || [])
+                        }).filter(Boolean) : (p.InterestedCategories || p.interested_categories || []),
+                        resume_url: p.ResumeUrl || p.resume_url || ''
                     });
                     if (p.WorkExperiences) {
                         setExperiences(p.WorkExperiences.map(ex => ({
@@ -405,12 +408,6 @@ const ProfilePage = () => {
         <div className="min-h-screen bg-slate-50 dark:bg-[#0f1115] text-slate-900 dark:text-[#f8fafc] font-sans pb-12 relative overflow-hidden">
             <GlobalNavbar />
 
-            {/* Premium Gradient Banner */}
-            {/* <div className="h-48 w-full bg-[linear-gradient(to_right,rgba(0,153,102,0.1),rgba(0,136,85,0.1),rgba(0,119,68,0.1))] dark:bg-[linear-gradient(to_right,rgba(0,153,102,0.05),rgba(0,136,85,0.05),rgba(0,119,68,0.05))] relative top-0 left-0 z-0 overflow-hidden">
-                <div className="absolute inset-0 bg-white/30 dark:bg-[#0f1115]/80 backdrop-blur-3xl"></div>
-                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] dark:opacity-[0.02]"></div>
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-50 dark:from-[#0f1115] to-transparent"></div>
-            </div> */}
 
             <main className="max-w-[1200px] mx-auto pt-20 px-4 sm:px-6 relative z-10 pb-16">
 
@@ -591,6 +588,13 @@ const ProfilePage = () => {
 
                                             <div className="py-5 border-b border-slate-200/50 dark:border-[#262933]/50">
                                                 <CategoriesView formData={formData} availableCategories={availableCategories} />
+                                            </div>
+
+                                            <div className="py-5 border-b border-slate-200/50 dark:border-[#262933]/50">
+                                                <ResumeManagement 
+                                                    resumeUrl={formData.resume_url} 
+                                                    onRefresh={fetchProfile} 
+                                                />
                                             </div>
 
                                             <div className="pt-5">

@@ -3,6 +3,14 @@
 // Using Vite's environment variables or defaulting to a local backend development port (backend runs on 8080)
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 
+const getHeaders = () => {
+    const token = localStorage.getItem('accessToken');
+    return {
+        'Content-Type': 'application/json',
+        'Authorization': token ? `Bearer ${token}` : '',
+    };
+};
+
 /**
  * Helper function to handle fetch responses and throw structured errors
  */
@@ -99,5 +107,24 @@ export const authAPI = {
             body: JSON.stringify(payload),
         });
         return handleResponse(response);
-    }
+    },
+
+    /**
+     * Get the current user's permissions
+     */
+    // getMyPermissions: async () => {
+    //     const response = await fetch(`${API_BASE_URL}/me/permissions`, {
+    //         headers: getHeaders(),
+    //         credentials: 'include'
+    //     });
+    //     return handleResponse(response);
+    // }
+    getMyPermissions: async () => {
+        
+    const response = await fetch(`${API_BASE_URL}/me/permissions`, {
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include'
+    });
+    return handleResponse(response);
+}
 };

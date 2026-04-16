@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, Compass, Building2, Briefcase, MessageSquare, User, ArrowLeft } from 'lucide-react';
+import { Home, Compass, Building2, Briefcase, MessageSquare, User, ArrowLeft, Sparkles } from 'lucide-react';
 import { seekerAPI } from '../api/seeker';
 import { hirerAPI } from '../api/hirer';
 import { chatAPI } from '../api/chat';
@@ -16,6 +16,8 @@ const GlobalNavbar = () => {
     const [isDarkMode, setIsDarkMode] = useState(() => {
         return localStorage.getItem('theme') === 'dark';
     });
+    const [isSubscribed, setIsSubscribed] = useState(false);
+    const [isSubLoading, setIsSubLoading] = useState(false);
 
     useEffect(() => {
         const fetchProfilePic = async () => {
@@ -37,6 +39,20 @@ const GlobalNavbar = () => {
             }
         };
         fetchProfilePic();
+
+        const fetchSubscriptionStatus = async () => {
+            if (user?.role !== 'hirer') return;
+            setIsSubLoading(true);
+            try {
+                const res = await hirerAPI.getSubscriptionStatus();
+                setIsSubscribed(res.subscribed && res.status === 'active');
+            } catch (err) {
+                console.error("Failed to fetch subscription status in navbar:", err);
+            } finally {
+                setIsSubLoading(false);
+            }
+        };
+        fetchSubscriptionStatus();
     }, [user?.role]);
 
     useEffect(() => {
@@ -108,13 +124,23 @@ const GlobalNavbar = () => {
     if (user?.role === 'hirer') {
         return (
             <header className="fixed top-0 left-0 right-0 h-16 glass-panel border-b border-gray-200/50 dark:border-[#262933]/50 z-50 px-4 lg:px-8 transition-colors duration-300 backdrop-blur-md bg-white/70 dark:bg-[#0f1115]/70">
-                <div className="max-w-[1200px] mx-auto h-full flex items-center">
+                <div className="max-w-[1200px] mx-auto h-full flex items-center justify-between">
                     <button 
                         onClick={() => navigate('/hirer')}
                         className="flex items-center gap-2 text-sm font-bold text-[#009966] hover:text-[#007744] transition-all hover:-translate-x-1 bg-transparent border-none p-0"
                     >
                         <ArrowLeft size={20} strokeWidth={2.5} /> Back to Dashboard
                     </button>
+
+                    {!isSubLoading && !isSubscribed && (
+                        <button
+                            onClick={() => navigate('/hirer/subscriptions')}
+                            className="flex items-center gap-2 bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-slate-900 font-extrabold px-4 py-2 rounded-full text-xs uppercase tracking-wider transition-all shadow-md hover:shadow-lg active:scale-95 border-none"
+                        >
+                            <Sparkles size={14} className="animate-pulse" />
+                            Go Pro
+                        </button>
+                    )}
                 </div>
             </header>
         );

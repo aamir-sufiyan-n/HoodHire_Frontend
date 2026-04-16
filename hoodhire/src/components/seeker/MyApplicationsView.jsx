@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Briefcase, MapPin, DollarSign, Clock, XCircle, Loader2, FileText, ExternalLink, Filter, ChevronLeft, ChevronRight, CheckCircle, IndianRupee, MessageCircle } from 'lucide-react';
+import { Briefcase, MapPin, DollarSign, Clock, XCircle, Loader2, FileText, ExternalLink, Filter, ChevronLeft, ChevronRight, CheckCircle, IndianRupee, MessageCircle, CheckCircle2 } from 'lucide-react';
 import { jobsAPI } from '../../api/jobs';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 const MyApplicationsView = () => {
     const [applications, setApplications] = useState([]);
-    const [jobs, setJobs] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [counts, setCounts] = useState({ all: 0, pending: 0, accepted: 0, rejected: 0 });
 
     // New states for formatting and functionality
     const [activeTab, setActiveTab] = useState('all'); // 'all', 'pending', 'accepted', 'rejected'
@@ -17,29 +17,22 @@ const MyApplicationsView = () => {
 
     const navigate = useNavigate();
 
-    const fetchApplications = async () => {
+    const fetchApplications = async (status = activeTab, isInitial = false) => {
         setLoading(true);
         try {
-            const [appsRes, jobsRes, catRes] = await Promise.all([
-                jobsAPI.getMyApplications().catch(() => null),
-                jobsAPI.getAllJobs().catch(() => null),
-                jobsAPI.getCategories().catch(() => ({ categories: [] }))
-            ]);
+            const appsRes = await jobsAPI.getMyApplications(status);
             setApplications(appsRes?.applications || []);
 
-            const jobsList = jobsRes?.jobs || [];
-            const categoriesMap = {};
-            if (catRes && catRes.categories) {
-                catRes.categories.forEach(c => categoriesMap[c.ID] = c);
+            if (status === 'all' || isInitial) {
+                const allRes = await jobsAPI.getMyApplications('all');
+                const all = allRes?.applications || [];
+                setCounts({
+                    all: all.length,
+                    pending: all.filter(a => a.Status === 'pending').length,
+                    accepted: all.filter(a => a.Status === 'accepted').length,
+                    rejected: all.filter(a => a.Status === 'rejected').length
+                });
             }
-
-            jobsList.forEach(job => {
-                if (job.CategoryID && categoriesMap[job.CategoryID]) {
-                    job.Category = categoriesMap[job.CategoryID];
-                }
-            });
-
-            setJobs(jobsList);
         } catch (error) {
             console.error(error);
             toast.error("Failed to load your applications");
@@ -49,25 +42,29 @@ const MyApplicationsView = () => {
     };
 
     useEffect(() => {
-        fetchApplications();
+        fetchApplications(activeTab, true);
     }, []);
+
+    const prevTabRef = React.useRef(activeTab);
+    useEffect(() => {
+        if (prevTabRef.current !== activeTab) {
+            fetchApplications(activeTab);
+            prevTabRef.current = activeTab;
+        }
+    }, [activeTab]);
 
     // Derived Data
     const processedApplications = useMemo(() => {
-        let filtered = applications;
+        let sorted = [...applications];
 
-        if (activeTab !== 'all') {
-            filtered = filtered.filter(app => app.Status === activeTab);
-        }
-
-        filtered.sort((a, b) => {
+        sorted.sort((a, b) => {
             const dateA = new Date(a.CreatedAt).getTime();
             const dateB = new Date(b.CreatedAt).getTime();
             return sortOrder === 'desc' ? dateB - dateA : dateA - dateB;
         });
 
-        return filtered;
-    }, [applications, activeTab, sortOrder]);
+        return sorted;
+    }, [applications, sortOrder]);
 
     const totalPages = Math.ceil(processedApplications.length / itemsPerPage);
     const paginatedApplications = processedApplications.slice(
@@ -86,7 +83,7 @@ const MyApplicationsView = () => {
         try {
             await jobsAPI.withdrawApplication(appId);
             toast.success("Application withdrawn successfully");
-            fetchApplications();
+            fetchApplications(activeTab, true);
         } catch (error) {
             toast.error("Failed to withdraw application");
         }
@@ -143,7 +140,7 @@ const MyApplicationsView = () => {
                     >
                         {tab.label}
                         <span className="ml-2 px-1.5 py-0.5 rounded-full text-xs bg-slate-100 dark:bg-[#262933] text-slate-600 dark:text-slate-400">
-                            {tab.id === 'all' ? applications.length : applications.filter(a => a.Status === tab.id).length}
+                            {counts[tab.id] || 0}
                         </span>
                     </button>
                 ))}
@@ -169,19 +166,23 @@ const MyApplicationsView = () => {
             ) : (
                 <div className="flex flex-col gap-4">
                     {paginatedApplications.map(app => {
-                        const job = jobs.find(j => j.ID === app.JobID) || {};
+                        const job = app.Job || {};
+                        const jobStatus = job.Status || job.status || '';
+                        const isJobClosed = jobStatus === 'closed' || jobStatus === 'filled';
+                        const isJobDeleted = !job.ID;
+ 
                         const statusColors = {
-                            pending: 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 border-amber-200 dark:border-amber-900/40',
-                            accepted: 'bg-[#dff5ea] text-[#007744] dark:bg-emerald-900/30 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/50',
-                            rejected: 'bg-rose-100 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400 border-rose-200 dark:border-rose-900/40',
-                            withdrawn: 'bg-slate-100 text-slate-600 dark:bg-[#262933] dark:text-slate-400 border-slate-200 dark:border-[#303340]'
+                             pending: 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 border-amber-200 dark:border-amber-900/40',
+                             accepted: 'bg-[#dff5ea] text-[#007744] dark:bg-emerald-900/30 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900/50',
+                             rejected: 'bg-rose-100 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400 border-rose-200 dark:border-rose-900/40',
+                             withdrawn: 'bg-slate-100 text-slate-600 dark:bg-[#262933] dark:text-slate-400 border-slate-200 dark:border-[#303340]'
                         };
 
                         return (
                             <div key={app.ID} className="bg-white dark:bg-[#1a1d24] border border-slate-200 dark:border-[#303340] rounded-md p-5 hover:shadow-md transition-all group flex flex-col md:flex-row justify-between items-start md:items-center gap-5 premium-shadow">
 
                                 <div className="flex-1 cursor-pointer w-full flex gap-4" onClick={() => navigate(`/jobs/${job.ID}`)}>
-                                    <div className="w-14 h-14 shrink-0 bg-slate-50 dark:bg-[#262933] border border-slate-100 dark:border-[#303340] rounded-md flex items-center justify-center overflow-hidden shadow-sm">
+                                    <div className={`w-14 h-14 shrink-0 bg-slate-50 dark:bg-[#262933] rounded-md flex items-center justify-center overflow-hidden shadow-sm ${(job.Business?.Hirer?.IsPRO || job.Business?.IsPRO) ? 'border-2 border-[#0095F6]' : 'border border-slate-100 dark:border-[#303340]'}`}>
                                         {(job.Business?.ProfilePicture || job.Business?.Hirer?.ProfilePicture || job.Hirer?.ProfilePicture || job.ProfilePicture) ? (
                                             <img
                                                 src={job.Business?.ProfilePicture || job.Business?.Hirer?.ProfilePicture || job.Hirer?.ProfilePicture || job.ProfilePicture}
@@ -193,29 +194,44 @@ const MyApplicationsView = () => {
                                         )}
                                     </div>
                                     <div>
-                                        <div className="flex items-center gap-3 mb-1.5">
+                                         <div className="flex items-center gap-3 mb-1.5 flex-wrap">
                                         <h3 className="text-xl font-extrabold text-slate-900 dark:text-white group-hover:text-[#009966] transition-colors">
-                                            {job.Description?.Title || 'Untitled Job'}
-                                            <ExternalLink size={14} className="inline ml-2 opacity-0 group-hover:opacity-100 transition-opacity text-slate-400" />
+                                            {job.Description?.Title || job.title || 'Untitled Job'}
+                                            {!isJobClosed && !isJobDeleted && <ExternalLink size={14} className="inline ml-2 opacity-0 group-hover:opacity-100 transition-opacity text-slate-400" />}
                                         </h3>
-                                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${statusColors[app.Status] || statusColors.pending}`}>
-                                            {app.Status}
-                                        </span>
+                                        <div className="flex items-center gap-2">
+                                             <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${statusColors[app.Status] || statusColors.pending}`}>
+                                                 {app.Status}
+                                             </span>
+                                             {isJobDeleted ? (
+                                                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border bg-rose-50 text-rose-600 dark:bg-rose-900/20 dark:text-rose-400 border-rose-200 dark:border-rose-800/40">
+                                                     Job No Longer Available
+                                                 </span>
+                                             ) : isJobClosed && (
+                                                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 border-slate-200 dark:border-slate-700">
+                                                     Closed
+                                                 </span>
+                                             )}
+                                        </div>
                                     </div>
 
                                     <p className="font-bold text-slate-700 dark:text-slate-300 mb-3 flex items-center gap-1.5">
-                                        <Briefcase size={14} className="text-[#009966]" /> {job.Business?.BusinessName || 'Company'}
+                                        <Briefcase size={14} className="text-[#009966]" /> 
+                                        {job.Business?.BusinessName || job.business?.name || job.BusinessName || 'Company'}
+                                        {(job.Business?.Hirer?.IsPRO || job.Business?.IsPRO) && (
+                                            <CheckCircle2 size={14} className="text-[#0095F6] fill-[#0095F6]/10 shrink-0" title="Verified Business" />
+                                        )}
                                     </p>
 
-                                    <div className="flex flex-wrap items-center gap-3 text-xs font-bold text-slate-500 dark:text-slate-400 mb-4">
+                                     <div className="flex flex-wrap items-center gap-3 text-xs font-bold text-slate-500 dark:text-slate-400 mb-4">
                                         <span className="flex items-center gap-1.5 bg-slate-50 dark:bg-[#262933] border border-slate-100 dark:border-[#303340] px-2 py-1 rounded-sm">
-                                            <MapPin size={12} className="text-slate-400" /> {job.Business?.Locality || job.Business?.City || 'Local'}
+                                            <MapPin size={12} className="text-slate-400" /> {job.Business?.Locality || job.Business?.City || job.business?.city || 'Local'}
                                         </span>
                                         <span className="flex items-center gap-1.5 bg-slate-50 dark:bg-[#262933] border border-slate-100 dark:border-[#303340] px-2 py-1 rounded-sm capitalize">
-                                            <Briefcase size={12} className="text-slate-400" /> {job.Description?.JobType?.replace('_', ' ')}
+                                            <Briefcase size={12} className="text-slate-400" /> {(job.Description?.JobType || job.job_type || 'N/A').replace('_', ' ')}
                                         </span>
                                         <span className="flex items-center gap-1.5 bg-slate-50 dark:bg-[#262933] border border-slate-100 dark:border-[#303340] px-2 py-1 rounded-sm text-[#009966]">
-                                            <IndianRupee size={12} /> {job.Description?.SalaryMin}-{job.Description?.SalaryMax}
+                                            <IndianRupee size={12} /> {job.Description?.SalaryMin || job.salary_min || '0'}-{job.Description?.SalaryMax || job.salary_max || '0'}
                                         </span>
                                     </div>
                                     <p className="text-xs font-medium text-slate-400 dark:text-[#64748b] flex items-center gap-1.5">
@@ -233,7 +249,7 @@ const MyApplicationsView = () => {
                                             <MessageCircle size={16} /> Message
                                         </button>
                                     )}
-                                    {app.Status === 'pending' && (
+                                    {app.Status === 'pending' && !isJobClosed && !isJobDeleted && (
                                         <button
                                             onClick={(e) => { e.stopPropagation(); handleWithdraw(app.ID); }}
                                             className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 border border-slate-200 dark:border-[#303340] text-slate-600 dark:text-slate-300 hover:text-rose-600 hover:border-rose-200 dark:hover:text-rose-400 rounded-sm font-bold text-sm transition-colors"
