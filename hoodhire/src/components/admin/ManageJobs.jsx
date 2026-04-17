@@ -14,9 +14,11 @@ import {
   MoreVertical,
   ChevronRight,
   ExternalLink,
-  FileDown
+  FileDown,
+  Eye
 } from 'lucide-react';
 import { adminAPI, API_BASE_URL } from '../../api/admin/admin';
+import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import Swal from 'sweetalert2';
 
@@ -224,43 +226,40 @@ const ManageJobs = () => {
                                                 </td>
                                                 <td className="px-8 py-6">
                                                     <div className="flex items-center justify-end gap-2">
-                                                        {/* Status Update Quick Actions */}
-                                                        <div className="flex items-center bg-slate-50 dark:bg-slate-800/50 p-1 rounded-md border border-slate-100 dark:border-slate-800 opacity-60 group-hover:opacity-100 transition-opacity">
-                                                            <button 
-                                                                onClick={() => handleStatusUpdate(job.ID, 'open')}
-                                                                disabled={job.Status === 'open' || updatingID === job.ID}
-                                                                className={`p-1.5 rounded-md transition-colors ${job.Status === 'open' ? 'text-emerald-500 bg-white dark:bg-slate-700 shadow-sm' : 'text-slate-400 hover:text-emerald-500'}`}
-                                                                title="Set Open"
+                                                         {/* Status Dropdown */}
+                                                         <div className="relative group/select">
+                                                            <select 
+                                                                value={job.Status}
+                                                                onChange={(e) => handleStatusUpdate(job.ID, e.target.value)}
+                                                                disabled={updatingID === job.ID}
+                                                                className={`pl-3 pr-8 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border appearance-none cursor-pointer transition-all focus:ring-2 focus:ring-emerald-500/20 outline-none ${getStatusStyles(job.Status)}`}
                                                             >
-                                                                <CheckCircle2 size={16} />
-                                                            </button>
-                                                            <button 
-                                                                onClick={() => handleStatusUpdate(job.ID, 'filled')}
-                                                                disabled={job.Status === 'filled' || updatingID === job.ID}
-                                                                className={`p-1.5 rounded-md transition-colors ${job.Status === 'filled' ? 'text-amber-500 bg-white dark:bg-slate-700 shadow-sm' : 'text-slate-400 hover:text-amber-500'}`}
-                                                                title="Set Filled"
-                                                            >
-                                                                <Clock size={16} />
-                                                            </button>
-                                                            <button 
-                                                                onClick={() => handleStatusUpdate(job.ID, 'closed')}
-                                                                disabled={job.Status === 'closed' || updatingID === job.ID}
-                                                                className={`p-1.5 rounded-md transition-colors ${job.Status === 'closed' ? 'text-rose-500 bg-white dark:bg-slate-700 shadow-sm' : 'text-slate-400 hover:text-rose-500'}`}
-                                                                title="Set Closed"
-                                                            >
-                                                                <XCircle size={16} />
-                                                            </button>
-                                                        </div>
+                                                                <option value="open">Open</option>
+                                                                <option value="closed">Closed</option>
+                                                                <option value="filled">Filled</option>
+                                                            </select>
+                                                            <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none opacity-50">
+                                                                <ChevronRight size={10} className="rotate-90" />
+                                                            </div>
+                                                         </div>
 
-                                                        <div className="w-px h-6 bg-slate-200 dark:bg-slate-800 mx-1" />
+                                                         <div className="w-px h-6 bg-slate-200 dark:bg-slate-800 mx-1" />
 
-                                                        <button 
-                                                            onClick={() => handleDeleteJob(job.ID, job.Description?.Title)}
-                                                            className="p-2.5 rounded-md hover:bg-rose-50 dark:hover:bg-rose-900/20 text-slate-400 hover:text-rose-600 transition-all active:scale-95 border border-transparent hover:border-rose-100 dark:hover:border-rose-900/30"
-                                                            title="Delete Position"
-                                                        >
-                                                            <Trash2 size={18} />
-                                                        </button>
+                                                         <Link 
+                                                            to={`/admin/jobs/${job.ID}`}
+                                                            className="p-2.5 rounded-md hover:bg-emerald-50 dark:hover:bg-emerald-900/20 text-slate-400 hover:text-emerald-600 transition-all active:scale-95 border border-transparent hover:border-emerald-100 dark:hover:border-emerald-900/30"
+                                                            title="View Details"
+                                                         >
+                                                            <Eye size={18} />
+                                                         </Link>
+
+                                                         <button 
+                                                             onClick={() => handleDeleteJob(job.ID, job.Description?.Title)}
+                                                             className="p-2.5 rounded-md hover:bg-rose-50 dark:hover:bg-rose-900/20 text-slate-400 hover:text-rose-600 transition-all active:scale-95 border border-transparent hover:border-rose-100 dark:hover:border-rose-900/30"
+                                                             title="Delete Position"
+                                                         >
+                                                             <Trash2 size={18} />
+                                                         </button>
                                                     </div>
                                                 </td>
                                             </tr>

@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { adminAPI } from '../../api/admin/admin';
+import Swal from 'sweetalert2';
 
 const BusinessDetails = () => {
   const { id } = useParams();
@@ -53,13 +54,36 @@ const BusinessDetails = () => {
   };
 
   const handleReject = async () => {
-    try {
-      const targetId = business.HirerID || business.ID;
-      await adminAPI.rejectBusiness(targetId);
-      toast.success('Business rejected');
-      setBusiness(prev => ({ ...prev, Status: 'rejected', IsVerified: false }));
-    } catch (err) {
-      toast.error(err.message || 'Failed to reject business');
+    const { value: reason, isConfirmed } = await Swal.fire({
+      title: 'Reject Verification',
+      text: 'Please provide a reason for rejecting this business.',
+      input: 'textarea',
+      inputPlaceholder: 'Enter the reason for rejection...',
+      inputAttributes: {
+        'aria-label': 'Type your message here'
+      },
+      showCancelButton: true,
+      confirmButtonText: 'Confirm Reject',
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#64748b',
+      background: document.documentElement.classList.contains('dark') ? '#1a1d24' : '#fff',
+      color: document.documentElement.classList.contains('dark') ? '#f8fafc' : '#0f172a',
+      inputValidator: (value) => {
+        if (!value) {
+          return 'You need to provide a reason!';
+        }
+      }
+    });
+
+    if (isConfirmed && reason) {
+      try {
+        const targetId = business.HirerID || business.ID;
+        await adminAPI.rejectBusiness(targetId, reason);
+        toast.success(`Business rejected. Reason: ${reason}`);
+        setBusiness(prev => ({ ...prev, Status: 'rejected', IsVerified: false }));
+      } catch (err) {
+        toast.error(err.message || 'Failed to reject business');
+      }
     }
   };
 

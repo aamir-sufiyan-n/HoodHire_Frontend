@@ -670,8 +670,11 @@ const HirerProfilePage = () => {
                                         </button>
                                     </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
-                                        <div className="bg-white/80 dark:bg-[#1a1d24]/60 p-5 rounded-md border border-slate-200/60 dark:border-white/5 shadow-sm">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
+                            <div className={(
+                                "bg-white/80 dark:bg-[#1a1d24]/60 p-5 rounded-md border border-slate-200/60 dark:border-white/5 shadow-sm",
+                                !subscription?.subscribed && "lg:col-span-3 md:col-span-2"
+                            )}>
                                             <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3">Plan Details</p>
                                             <div className="space-y-2">
                                                 <div className="flex justify-between items-center text-sm">
@@ -699,11 +702,11 @@ const HirerProfilePage = () => {
                                             </div>
                                         </div>
 
-                                        <div className="md:col-span-1 lg:col-span-2 bg-white/80 dark:bg-[#1a1d24]/60 p-5 rounded-md border border-slate-200/60 dark:border-white/5 shadow-sm">
-                                            <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3">Plan Advantages</p>
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                                {subscription?.subscribed ? (
-                                                    (subscription?.plan?.Advantages && subscription.plan.Advantages.length > 0) ? (
+                                        {subscription?.subscribed && (
+                                            <div className="md:col-span-1 lg:col-span-2 bg-white/80 dark:bg-[#1a1d24]/60 p-5 rounded-md border border-slate-200/60 dark:border-white/5 shadow-sm">
+                                                <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3">Plan Advantages</p>
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                    {(subscription?.plan?.Advantages && subscription.plan.Advantages.length > 0) ? (
                                                         subscription.plan.Advantages.map((adv, idx) => (
                                                             <div key={idx} className="flex items-center gap-2.5 text-slate-700 dark:text-slate-300">
                                                                 <div className="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center shrink-0">
@@ -714,31 +717,10 @@ const HirerProfilePage = () => {
                                                         ))
                                                     ) : (
                                                         <span className="text-sm text-slate-500 italic">None</span>
-                                                    )
-                                                ) : (
-                                                    <>
-                                                        <div className="flex items-center gap-2.5 text-slate-700 dark:text-slate-300">
-                                                            <div className="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center shrink-0">
-                                                                    <CheckCircle2 size={12} className="text-emerald-600 dark:text-emerald-400" />
-                                                            </div>
-                                                            <span className="text-sm font-medium leading-tight">Basic Job Search (Local)</span>
-                                                        </div>
-                                                        <div className="flex items-center gap-2.5 text-slate-700 dark:text-slate-300">
-                                                            <div className="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center shrink-0">
-                                                                    <CheckCircle2 size={12} className="text-emerald-600 dark:text-emerald-400" />
-                                                            </div>
-                                                            <span className="text-sm font-medium leading-tight">Apply to 5 Jobs / Month</span>
-                                                        </div>
-                                                        <div className="flex items-center gap-2.5 text-slate-700 dark:text-slate-300">
-                                                            <div className="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center shrink-0">
-                                                                    <CheckCircle2 size={12} className="text-emerald-600 dark:text-emerald-400" />
-                                                            </div>
-                                                            <span className="text-sm font-medium leading-tight">Limited Business Analytics</span>
-                                                        </div>
-                                                    </>
-                                                )}
+                                                    )}
+                                                </div>
                                             </div>
-                                        </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>

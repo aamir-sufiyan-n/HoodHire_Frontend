@@ -35,6 +35,7 @@ import SubscriptionRevenue from './components/admin/SubscriptionRevenue';
 import HirerSubscriptionsPage from './components/hirer/HirerSubscriptionsPage';
 import AdminRoute from './components/admin/AdminRoute';
 import ProtectedRoute from './components/ProtectedRoute';
+import AdminJobDetails from './components/admin/AdminJobDetails';
 
 function App() {
   useEffect(() => {
@@ -104,6 +105,7 @@ function App() {
           <Route path="tickets" element={<ManageTickets />} />
           <Route path="roles" element={<ManageRoles />} />
           <Route path="jobs" element={<ManageJobs />} />
+          <Route path="jobs/:id" element={<AdminJobDetails />} />
           <Route path="categories" element={<ManageCategories />} />
           <Route path="subscriptions" element={<ManageSubscriptions />} />
           <Route path="revenue" element={<SubscriptionRevenue />} />

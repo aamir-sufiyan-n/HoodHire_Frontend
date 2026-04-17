@@ -164,11 +164,12 @@ export const adminAPI = {
         return handleResponse(response);
     },
 
-    rejectBusiness: async (userID) => {
+    rejectBusiness: async (userID, reason) => {
         const response = await fetch(`${API_BASE_URL}/admin/businesses/${userID}/reject`, {
             method: 'PATCH',
             headers: getHeaders(),
             credentials: 'include',
+            body: JSON.stringify({ reason })
         });
         return handleResponse(response);
     },
@@ -255,6 +256,24 @@ export const adminAPI = {
             headers: getHeaders(),
             credentials: 'include',
             body: JSON.stringify({ status })
+        });
+        return handleResponse(response);
+    },
+    
+    getJobByID: async (id) => {
+        const response = await fetch(`${API_BASE_URL}/jobs/${id}`, {
+            headers: getHeaders(),
+            credentials: 'include'
+        });
+        return handleResponse(response);
+    },
+
+    updateJob: async (id, jobData) => {
+        const response = await fetch(`${API_BASE_URL}/admin/jobs/${id}`, {
+            method: 'PATCH',
+            headers: getHeaders(),
+            credentials: 'include',
+            body: JSON.stringify(jobData)
         });
         return handleResponse(response);
     },
@@ -392,7 +411,7 @@ export const adminAPI = {
     },
 
     getSubscriptionsExpiring: async (days) => {
-        const response = await fetch(`${API_BASE_URL}/admin/subscription/${days}`, {
+        const response = await fetch(`${API_BASE_URL}/admin/subscription/expiring/${days}`, {
             headers: getHeaders(),
             credentials: 'include'
         });

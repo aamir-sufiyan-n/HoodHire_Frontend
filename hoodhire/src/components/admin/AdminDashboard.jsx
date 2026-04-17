@@ -7,7 +7,8 @@ import {
   Loader2,
   Briefcase,
   Shield,
-  ArrowRight
+  ArrowRight,
+  IndianRupee
 } from 'lucide-react';
 import { adminAPI } from '../../api/admin/admin';
 import { authAPI } from '../../api/auth';
@@ -36,7 +37,8 @@ const AdminDashboard = () => {
     hirers: 0,
     jobs: 0,
     tickets: 0,
-    activeTickets: 0
+    activeTickets: 0,
+    revenue: 0
   });
   const [loading, setLoading] = useState(true);
   const [recentUsers, setRecentUsers] = useState([]);
@@ -97,6 +99,14 @@ const AdminDashboard = () => {
               .catch(err => console.error('Tickets stat error:', err))
           );
         }
+        
+        if (perms.subscription_management) {
+          requests.push(
+            adminAPI.getTotalRevenue()
+              .then(data => setStats(prev => ({ ...prev, revenue: data.total_revenue || 0 })))
+              .catch(err => console.error('Revenue stat error:', err))
+          );
+        }
 
         await Promise.all(requests);
       } catch (err) {
@@ -151,15 +161,23 @@ const AdminDashboard = () => {
       icon: TicketCheck,
       color: 'amber'
     },
-    {
-      title: 'Account Settings',
-      desc: 'Security & Preferences',
-      path: '/admin/profile',
-      permission: null,
-      icon: Shield,
-      color: 'slate'
-    }
-  ].filter(action => !action.permission || permissions[action.permission] === true);
+      {
+        title: 'Account Settings',
+        desc: 'Security & Preferences',
+        path: '/admin/profile',
+        permission: null,
+        icon: Shield,
+        color: 'slate'
+      },
+      {
+        title: 'Subscription Revenue',
+        desc: 'Financial growth & plans',
+        path: '/admin/revenue',
+        permission: 'subscription_management',
+        icon: IndianRupee,
+        color: 'emerald'
+      }
+    ].filter(action => !action.permission || permissions[action.permission] === true);
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -183,6 +201,14 @@ const AdminDashboard = () => {
         )}
         {permissions.ticket_management && (
           <StatCard title="Active Support" value={stats.activeTickets} icon={TrendingUp} color="text-purple-500" />
+        )}
+        {permissions.subscription_management && (
+          <StatCard 
+            title="Total Revenue" 
+            value={new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(stats.revenue )} 
+            icon={IndianRupee} 
+            color="text-emerald-500" 
+          />
         )}
       </div>
 

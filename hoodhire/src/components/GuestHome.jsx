@@ -74,7 +74,7 @@ const GuestHome = () => {
             <div className="fixed inset-0 -z-20 bg-slate-50 dark:bg-[#0f1115] pointer-events-none"></div>
 
             {/* Navbar */}
-            <header className={`fixed top-0 flex justify-between left-0 right-0 h-20 z-40 px-4 lg:px-8 transition-colors duration-300 bg-transparent   `}>
+            <header className={`fixed top-0 flex justify-between left-0 right-0 h-20 z-40 px-4 lg:px-8 transition-all duration-300 ${isScrolled ? 'bg-white/80 dark:bg-[#0f1115]/80 backdrop-blur-lg border-b border-slate-200 dark:border-white/10 shadow-sm' : 'bg-transparent backdrop-blur-[2px]'}`}>
                 <div className="flex justify-between items-center gap-8 w-full max-w-7xl mx-auto h-full">
                     {/* Logo */}
                     <div className="text-2xl font-extrabold tracking-tight cursor-pointer shrink-0 group flex items-center" onClick={() => navigate('/')}>
@@ -98,13 +98,13 @@ const GuestHome = () => {
                             Why Us
                         </button>
                         <button 
-                            onClick={() => navigate('/jobs')} 
+                            onClick={() => scrollToSection('jobs-here')} 
                             className={`text-sm font-bold transition-all hover:scale-105 active:scale-95 ${isScrolled ? 'text-slate-600 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-500' : 'text-white/80 hover:text-white'}`}
                         >
                             Find Jobs
                         </button>
                         <button 
-                            onClick={() => navigate('/companies')} 
+                            onClick={() => navigate('/')} 
                             className={`text-sm font-bold transition-all hover:scale-105 active:scale-95 ${isScrolled ? 'text-slate-600 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-500' : 'text-white/80 hover:text-white'}`}
                         >
                             Companies
@@ -227,7 +227,7 @@ const GuestHome = () => {
                         </div>
 
                         {/* Floating Badge overlaying the slider */}
-                        <div className="absolute bottom-6 left-[10%] right-[10%] z-30 bg-white dark:bg-[#16181d] opacity-95 rounded-sm p-4 border border-slate-100 dark:border-[#303340] shadow-2xl flex items-center flex-wrap sm:flex-nowrap justify-center gap-4 hover:scale-105 transition-transform duration-300 cursor-pointer">
+                        {/* <div className="absolute bottom-6 left-[10%] right-[10%] z-30 bg-white dark:bg-[#16181d] opacity-95 rounded-sm p-4 border border-slate-100 dark:border-[#303340] shadow-2xl flex items-center flex-wrap sm:flex-nowrap justify-center gap-4 hover:scale-105 transition-transform duration-300 cursor-pointer">
                             <div className="flex -space-x-3">
                                 <img src="https://i.pravatar.cc/150?img=1" alt="Avatar" className="w-10 h-10 rounded-sm border-2 border-white object-cover" />
                                 <img src="https://i.pravatar.cc/150?img=2" alt="Avatar" className="w-10 h-10 rounded-sm border-2 border-white object-cover" />
@@ -238,7 +238,7 @@ const GuestHome = () => {
                                 <span className="font-extrabold text-sm text-slate-900 dark:text-white block">10M+</span>
                                 <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">People are joined</span>
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                 </section>
 
@@ -317,7 +317,7 @@ const GuestHome = () => {
 
 
                 {/* BOTTOM CTA - SPLIT SECTION */}
-                <section className="pt-10 px-4 max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+                <section id="jobs-here" className="pt-10 px-4 max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
                     <div className="flex-1 w-full relative">
                         <div className="absolute -top-6 -left-6 w-32 h-32 bg-[#009966]/20 dark:bg-[#009966]/10 rounded-sm blur-[40px] z-0"></div>
                         <div className="absolute -bottom-6 -right-6 w-40 h-40 bg-emerald-400/20 dark:bg-emerald-500/10 rounded-sm blur-[40px] z-0"></div>

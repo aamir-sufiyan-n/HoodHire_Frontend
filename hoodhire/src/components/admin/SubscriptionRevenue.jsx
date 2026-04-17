@@ -12,7 +12,6 @@ import {
     IndianRupee, 
     Users,
     Download,
-    BarChart3,
     AlertCircle
 } from 'lucide-react';
 import { 
@@ -37,7 +36,6 @@ const SubscriptionRevenue = () => {
         monthly: []
     });
     const [subscriptions, setSubscriptions] = useState([]);
-    const [plans, setPlans] = useState([]);
     const [filtering, setFiltering] = useState({
         status: 'all',
         daysToExpiry: '',
@@ -52,7 +50,7 @@ const SubscriptionRevenue = () => {
     const fetchAllData = async () => {
         setLoading(true);
         try {
-            const [totalRes, monthlyRes, subsRes, plansRes] = await Promise.all([
+            const [totalRes, monthlyRes, subsRes] = await Promise.all([
                 adminAPI.getTotalRevenue(),
                 adminAPI.getMonthlyRevenue(),
                 adminAPI.getSubscriptions({ 
@@ -60,8 +58,7 @@ const SubscriptionRevenue = () => {
                     limit: pagination.limit,
                     status: filtering.status !== 'all' ? filtering.status : undefined,
                     search: filtering.search || undefined
-                }),
-                adminAPI.getPlans()
+                })
             ]);
 
             setRevenueStats({
@@ -85,7 +82,6 @@ const SubscriptionRevenue = () => {
 
             setSubscriptions(finalSubs);
             setPagination(prev => ({ ...prev, total: subsRes?.total || finalSubs.length }));
-            setPlans(Array.isArray(plansRes) ? plansRes : plansRes.plans || []);
 
         } catch (err) {
             console.error('Failed to fetch revenue data:', err);
@@ -103,7 +99,7 @@ const SubscriptionRevenue = () => {
         return new Intl.NumberFormat('en-IN', {
             style: 'currency',
             currency: 'INR',
-            maximumFractionDigits: 0
+            maximumFractionDigits: 2
         }).format(amount);
     };
 
@@ -151,7 +147,7 @@ const SubscriptionRevenue = () => {
                     </div>
                     <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Total Revenue</p>
                     <h3 className="text-3xl font-extrabold text-slate-900 dark:text-white mt-1">
-                        {formatCurrency(revenueStats.total / 100)}
+                        {formatCurrency(revenueStats.total)}
                     </h3>
                 </div>
 
@@ -185,103 +181,60 @@ const SubscriptionRevenue = () => {
                     </h3>
                 </div>
             </div>
-            {/* Middle Section: Chart and Plan Breakdown */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Revenue Graph */}
-                <div className="lg:col-span-2 bg-white dark:bg-[#1a1d24] p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm text-left">
-                    <div className="flex items-center justify-between mb-8">
-                        <div>
-                            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Revenue Growth</h3>
-                            <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1">Growth trend across the last several months.</p>
-                        </div>
-                    </div>
-
-                    <div className="h-[350px] w-full">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={revenueStats.monthly}>
-                                <defs>
-                                    <linearGradient id="colorAmount" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#059669" stopOpacity={0.1}/>
-                                        <stop offset="95%" stopColor="#059669" stopOpacity={0}/>
-                                    </linearGradient>
-                                </defs>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={document.documentElement.classList.contains('dark') ? '#262933' : '#f1f5f9'} />
-                                <XAxis 
-                                    dataKey="month" 
-                                    axisLine={false} 
-                                    tickLine={false} 
-                                    tick={{ fontSize: 10, fontWeight: 700, fill: '#64748b' }} 
-                                    dy={10}
-                                />
-                                <YAxis 
-                                    axisLine={false} 
-                                    tickLine={false} 
-                                    tick={{ fontSize: 10, fontWeight: 700, fill: '#64748b' }} 
-                                    tickFormatter={(val) => `₹${val}`}
-                                />
-                                <Tooltip 
-                                    contentStyle={{ 
-                                        backgroundColor: document.documentElement.classList.contains('dark') ? '#1a1d24' : '#ffffff', 
-                                        border: 'none', 
-                                        borderRadius: '8px', 
-                                        boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' 
-                                    }}
-                                    itemStyle={{ color: '#059669', fontSize: '12px', fontWeight: 800 }}
-                                    labelStyle={{ color: '#64748b', fontSize: '10px', marginBottom: '4px', fontWeight: 700 }}
-                                />
-                                <Area 
-                                    type="monotone" 
-                                    dataKey="amount" 
-                                    stroke="#059669" 
-                                    strokeWidth={3}
-                                    fillOpacity={1} 
-                                    fill="url(#colorAmount)" 
-                                    dot={{ r: 4, fill: '#059669', strokeWidth: 2, stroke: '#fff' }}
-                                    activeDot={{ r: 6, fill: '#059669', strokeWidth: 2, stroke: '#fff' }}
-                                />
-                            </AreaChart>
-                        </ResponsiveContainer>
+            {/* Middle Section: Chart */}
+            <div className="bg-white dark:bg-[#1a1d24] p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm text-left">
+                <div className="flex items-center justify-between mb-8">
+                    <div>
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">Revenue Growth</h3>
+                        <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1">Growth trend across the last several months.</p>
                     </div>
                 </div>
 
-                {/* Revenue by Plan */}
-                <div className="bg-white dark:bg-[#1a1d24] p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col text-left">
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6">Revenue by Plan</h3>
-                    <div className="space-y-6 flex-1">
-                        {plans.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center py-12 opacity-30">
-                                <CreditCard size={40} />
-                                <p className="text-xs font-bold mt-2">No plans defined</p>
-                            </div>
-                        ) : (
-                            plans.map((plan) => (
-                                <div key={plan.ID} className="flex flex-col gap-2">
-                                    <div className="flex justify-between items-end">
-                                        <div className="flex flex-col">
-                                            <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">{plan.Name || plan.plan_name}</span>
-                                            <span className="text-sm font-extrabold text-slate-900 dark:text-white mt-0.5">₹{(plan.Price / 100).toLocaleString()} / plan</span>
-                                        </div>
-                                        <div className="text-right">
-                                            {/* We don't have per-plan total directly, we'd need to call the API but let's show popularity */}
-                                            <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded">Popular</span>
-                                        </div>
-                                    </div>
-                                    <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                                        <div 
-                                            className="h-full bg-emerald-500 rounded-full transition-all duration-1000" 
-                                            style={{ width: `${Math.floor(Math.random() * 60) + 20}%` }}
-                                        />
-                                    </div>
-                                </div>
-                            ))
-                        )}
-                    </div>
-                    
-                    <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800">
-                        <button className="w-full text-center text-xs font-bold text-emerald-600 hover:text-emerald-500 transition-colors uppercase tracking-widest">
-                            View Detailed Plan Report
-                        </button>
-                    </div>
+                <div className="h-[400px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={revenueStats.monthly}>
+                            <defs>
+                                <linearGradient id="colorAmount" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#059669" stopOpacity={0.1}/>
+                                    <stop offset="95%" stopColor="#059669" stopOpacity={0}/>
+                                </linearGradient>
+                            </defs>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={document.documentElement.classList.contains('dark') ? '#262933' : '#f1f5f9'} />
+                            <XAxis 
+                                dataKey="month" 
+                                axisLine={false} 
+                                tickLine={false} 
+                                tick={{ fontSize: 10, fontWeight: 700, fill: '#64748b' }} 
+                                dy={10}
+                            />
+                            <YAxis 
+                                axisLine={false} 
+                                tickLine={false} 
+                                tick={{ fontSize: 10, fontWeight: 700, fill: '#64748b' }} 
+                                tickFormatter={(val) => `₹${val}`}
+                            />
+                            <Tooltip 
+                                contentStyle={{ 
+                                    backgroundColor: document.documentElement.classList.contains('dark') ? '#1a1d24' : '#ffffff', 
+                                    border: 'none', 
+                                    borderRadius: '8px', 
+                                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' 
+                                }}
+                                itemStyle={{ color: '#059669', fontSize: '12px', fontWeight: 800 }}
+                                labelStyle={{ color: '#64748b', fontSize: '10px', marginBottom: '4px', fontWeight: 700 }}
+                            />
+                            <Area 
+                                type="monotone" 
+                                dataKey="amount" 
+                                stroke="#059669" 
+                                strokeWidth={3}
+                                fillOpacity={1} 
+                                fill="url(#colorAmount)" 
+                                dot={{ r: 4, fill: '#059669', strokeWidth: 2, stroke: '#fff' }}
+                                activeDot={{ r: 6, fill: '#059669', strokeWidth: 2, stroke: '#fff' }}
+                            />
+                        </AreaChart>
+                    </ResponsiveContainer>
                 </div>
             </div>
 
