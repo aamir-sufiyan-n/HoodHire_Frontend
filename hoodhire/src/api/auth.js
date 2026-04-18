@@ -1,7 +1,7 @@
 // src/api/auth.js
 
 // Using Vite's environment variables or defaulting to a local backend development port (backend runs on 8080)
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://hoodhire.onrender.com';
 
 const getHeaders = () => {
     const token = localStorage.getItem('accessToken');

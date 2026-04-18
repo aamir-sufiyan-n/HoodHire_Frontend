@@ -1,7 +1,11 @@
 // src/api/chat.js
 
-const API_BASE_URL = import.meta.env.VITE_CHAT_API_BASE_URL || 'http://localhost:8081';
-const WS_BASE_URL = import.meta.env.VITE_WS_API_BASE_URL || 'ws://localhost:8081';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://hoodhire.onrender.com';
+// const WS_BASE_URL = import.meta.env.VITE_CHAT_BASE_URL || 'https://hoodhire-chat-service.onrender.com';
+const CHAT_BASE_URL =
+    import.meta.env.VITE_CHAT_BASE_URL || 'https://hoodhire-chat-service.onrender.com';
+
+const WS_BASE_URL = CHAT_BASE_URL.replace('https', 'wss');
 
 let socket = null;
 let listeners = new Set();
@@ -130,15 +134,15 @@ export const chatAPI = {
 
 
     getConversations: async () => {
-    const user = JSON.parse(localStorage.getItem('user'))
-    const role = user?.role
-    const endpoint = role === 'seeker' ? '/seeker/bonds' : '/hirer/bonds'
-    const response = await fetch(`http://localhost:8080${endpoint}`, {
-        headers: getAuthHeaders(), 
-        credentials: 'include'
-    })
-    return handleResponse(response)
-},
+        const user = JSON.parse(localStorage.getItem('user'))
+        const role = user?.role
+        const endpoint = role === 'seeker' ? '/seeker/bonds' : '/hirer/bonds'
+        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+            headers: getAuthHeaders(),
+            credentials: 'include'
+        })
+        return handleResponse(response)
+    },
 
     getUnreadCount: async () => {
         const response = await fetch(`${API_BASE_URL}/messages/unread`, {
